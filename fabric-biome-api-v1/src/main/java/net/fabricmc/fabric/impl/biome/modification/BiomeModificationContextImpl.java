@@ -287,7 +287,14 @@ public class BiomeModificationContextImpl implements BiomeModificationContext {
 				featureSteps.add(HolderSet.direct(Collections.emptyList()));
 			}
 
-			featureSteps.set(index, plus(featureSteps.get(index), getEntry(features, entry)));
+			Holder.Reference<PlacedFeature> feature = getEntry(features, entry);
+
+			// Don't add the feature if it's already present
+			if (featureSteps.get(index).contains(feature)) {
+				return;
+			}
+
+			featureSteps.set(index, plus(featureSteps.get(index), feature));
 
 			// Ensure the list of flower features is up-to-date
 			rebuildFeatures = true;
