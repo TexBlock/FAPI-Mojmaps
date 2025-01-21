@@ -31,6 +31,7 @@ import net.fabricmc.fabric.impl.attachment.AttachmentTypeImpl;
 import net.fabricmc.fabric.impl.attachment.sync.AttachmentChange;
 import net.fabricmc.fabric.impl.attachment.sync.s2c.AttachmentSyncPayloadS2C;
 import net.minecraft.core.HolderLookup;
+import net.minecraft.core.RegistryAccess;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
@@ -98,7 +99,7 @@ abstract class AttachmentTargetsMixin implements AttachmentTargetImpl {
 		if (this.fabric_shouldTryToSync() && this.fabric_dataAttachments != null) {
 			this.fabric_dataAttachments.forEach((type, value) -> {
 				if (type.isSynced()) {
-					acknowledgeSynced(type, value);
+					acknowledgeSynced(type, value, wrapperLookup);
 				}
 			});
 		}
@@ -115,8 +116,9 @@ abstract class AttachmentTargetsMixin implements AttachmentTargetImpl {
 	}
 
 	@Unique
-	private void acknowledgeSynced(AttachmentType<?> type, Object value) {
-		acknowledgeSyncedEntry(type, AttachmentChange.create(fabric_getSyncTargetInfo(), type, value, fabric_getDynamicRegistryManager()));
+	private void acknowledgeSynced(AttachmentType<?> type, Object value, HolderLookup.Provider wrapperLookup) {
+		RegistryAccess dynamicRegistryManager = (wrapperLookup instanceof RegistryAccess drm) ? drm : fabric_getDynamicRegistryManager();
+		acknowledgeSyncedEntry(type, AttachmentChange.create(fabric_getSyncTargetInfo(), type, value, dynamicRegistryManager));
 	}
 
 	@Unique
