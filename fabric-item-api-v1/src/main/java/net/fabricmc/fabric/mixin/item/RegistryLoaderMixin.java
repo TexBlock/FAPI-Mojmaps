@@ -16,6 +16,8 @@
 
 package net.fabricmc.fabric.mixin.item;
 
+import java.util.Optional;
+
 import com.google.gson.JsonElement;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
@@ -58,7 +60,14 @@ abstract class RegistryLoaderMixin {
 			RegistryEntryInfo entryInfo
 	) {
 		if (object instanceof Enchantment enchantment) {
-			object = EnchantmentUtil.modify((RegistryKey<Enchantment>) objectKey, enchantment, EnchantmentUtil.determineSource(resource));
+			Enchantment modified = EnchantmentUtil.modify((RegistryKey<Enchantment>) objectKey, enchantment, EnchantmentUtil.determineSource(resource));
+
+			if (modified != null) {
+				object = modified;
+
+				// Clear the knownPackInfo to force the server to sync the data pack to the client
+				registryEntryInfo = new RegistryEntryInfo(Optional.empty(), registryEntryInfo.lifecycle());
+			}
 		}
 
 		return original.call(instance, registryKey, object, registryEntryInfo);

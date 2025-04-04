@@ -18,6 +18,10 @@ package net.fabricmc.fabric.impl.item;
 
 import java.util.List;
 
+import org.jetbrains.annotations.Nullable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import net.minecraft.component.ComponentType;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.registry.RegistryKey;
@@ -32,10 +36,14 @@ import net.fabricmc.fabric.impl.resource.loader.ModResourcePackCreator;
 import net.fabricmc.fabric.mixin.item.EnchantmentBuilderAccessor;
 
 public class EnchantmentUtil {
+	private static final Logger LOGGER = LoggerFactory.getLogger(EnchantmentUtil.class);
+
 	@SuppressWarnings("unchecked")
+	@Nullable
 	public static Enchantment modify(RegistryKey<Enchantment> key, Enchantment originalEnchantment, EnchantmentSource source) {
 		Enchantment.Builder builder = Enchantment.builder(originalEnchantment.definition());
 		EnchantmentBuilderAccessor accessor = (EnchantmentBuilderAccessor) builder;
+		BuilderExtensions builderExtensions = (BuilderExtensions) builder;
 
 		builder.exclusiveSet(originalEnchantment.exclusiveSet());
 		accessor.getEffectMap().addAll(originalEnchantment.effects());
@@ -49,14 +57,23 @@ public class EnchantmentUtil {
 					}
 				});
 
+		// Reset the modified flag before invoking the event as we setup the builder above
+		builderExtensions.fabric$resetModified();
+
 		EnchantmentEvents.MODIFY.invoker().modify(key, builder, source);
 
-		return new Enchantment(
-				originalEnchantment.description(),
-				accessor.getDefinition(),
-				accessor.getExclusiveSet(),
-				accessor.getEffectMap().build()
-		);
+		if (builderExtensions.fabric$didModify()) {
+			LOGGER.debug("Enchantment {} was modified", key.getValue());
+
+			return new Enchantment(
+					originalEnchantment.description(),
+					accessor.getDefinition(),
+					accessor.getExclusiveSet(),
+					accessor.getEffectMap().build()
+			);
+		}
+
+		return null;
 	}
 
 	public static EnchantmentSource determineSource(Resource resource) {
@@ -77,4 +94,9 @@ public class EnchantmentUtil {
 	}
 
 	private EnchantmentUtil() { }
+
+	public interface BuilderExtensions {
+		void fabric$resetModified();
+		boolean fabric$didModify();
+	}
 }
