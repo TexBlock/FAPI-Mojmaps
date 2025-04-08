@@ -18,13 +18,11 @@ package net.fabricmc.fabric.test.transfer.ingame.client;
 
 import java.util.List;
 
+import net.minecraft.class_11227;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.render.RenderLayer;
-import net.minecraft.client.render.VertexConsumer;
+import net.minecraft.client.gl.RenderPipelines;
 import net.minecraft.client.texture.Sprite;
-import net.minecraft.client.texture.SpriteAtlasTexture;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.fluid.Fluids;
 import net.minecraft.text.Text;
@@ -56,10 +54,12 @@ public class FluidVariantRenderTest implements ClientModInitializer {
 				Sprite[] sprites = FluidVariantRendering.getSprites(variant);
 				int color = FluidVariantRendering.getColor(variant, player.getWorld(), player.getBlockPos());
 
+				drawContext.method_70850(class_11227.SCREEN_TOOLTIP);
+
 				if (sprites != null) {
-					drawFluidInGui(drawContext, sprites[0], color, 0, renderY);
+					drawContext.drawSpriteStretched(RenderPipelines.GUI_TEXTURED, sprites[0], 0, renderY, 16, 16, color);
 					renderY += 16;
-					drawFluidInGui(drawContext, sprites[1], color, 0, renderY);
+					drawContext.drawSpriteStretched(RenderPipelines.GUI_TEXTURED, sprites[1], 0, renderY, 16, 16, color);
 					renderY += 16;
 				}
 
@@ -72,33 +72,9 @@ public class FluidVariantRenderTest implements ClientModInitializer {
 					renderY += 10;
 					drawContext.drawTooltip(textRenderer, line, -8, renderY);
 				}
+
+				drawContext.method_70860();
 			}
-		});
-	}
-
-	private static void drawFluidInGui(DrawContext drawContext, Sprite sprite, int color, int i, int j) {
-		if (sprite == null) return;
-
-		float r = ((color >> 16) & 255) / 255f;
-		float g = ((color >> 8) & 255) / 255f;
-		float b = (color & 255) / 255f;
-
-		float x0 = (float) i;
-		float y0 = (float) j;
-		float x1 = x0 + 16;
-		float y1 = y0 + 16;
-		float z = 0.5f;
-		float u0 = sprite.getMinU();
-		float v0 = sprite.getMinV();
-		float u1 = sprite.getMaxU();
-		float v1 = sprite.getMaxV();
-
-		drawContext.draw(vertexConsumerProvider -> {
-			VertexConsumer vertexConsumer = vertexConsumerProvider.getBuffer(RenderLayer.getGuiTextured(SpriteAtlasTexture.BLOCK_ATLAS_TEXTURE));
-			vertexConsumer.vertex(x0, y1, z).color(r, g, b, 1).texture(u0, v1);
-			vertexConsumer.vertex(x1, y1, z).color(r, g, b, 1).texture(u1, v1);
-			vertexConsumer.vertex(x1, y0, z).color(r, g, b, 1).texture(u1, v0);
-			vertexConsumer.vertex(x0, y0, z).color(r, g, b, 1).texture(u0, v0);
 		});
 	}
 }

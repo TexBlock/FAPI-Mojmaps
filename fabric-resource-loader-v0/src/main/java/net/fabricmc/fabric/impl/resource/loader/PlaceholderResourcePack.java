@@ -44,7 +44,7 @@ public record PlaceholderResourcePack(ResourceType type, ResourcePackInfo metada
 
 	public PackResourceMetadata getMetadata() {
 		return ModResourcePackUtil.getMetadataPack(
-				SharedConstants.getGameVersion().getResourceVersion(type),
+				SharedConstants.getGameVersion().method_70592(type),
 				DESCRIPTION_TEXT
 		);
 	}

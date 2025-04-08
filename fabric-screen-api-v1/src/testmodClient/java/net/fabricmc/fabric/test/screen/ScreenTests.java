@@ -21,13 +21,14 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import net.minecraft.class_11227;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.gl.RenderPipelines;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.TitleScreen;
 import net.minecraft.client.gui.screen.ingame.CreativeInventoryScreen;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.gui.widget.ClickableWidget;
-import net.minecraft.client.render.RenderLayer;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 
@@ -80,7 +81,9 @@ public final class ScreenTests implements ClientModInitializer {
 			// Register render event to draw an icon on the screen
 			ScreenEvents.afterRender(screen).register((_screen, drawContext, mouseX, mouseY, tickDelta) -> {
 				// Render an armor icon to test
-				drawContext.drawGuiTexture(RenderLayer::getGuiTextured, ScreenTests.ARMOR_FULL_TEXTURE, (screen.width / 2) - 124, (screen.height / 4) + 96, 20, 20);
+				drawContext.method_70850(class_11227.HUD);
+				drawContext.drawGuiTexture(RenderPipelines.GUI_TEXTURED, ScreenTests.ARMOR_FULL_TEXTURE, (screen.width / 2) - 124, (screen.height / 4) + 96, 20, 20);
+				drawContext.method_70860();
 			});
 
 			ScreenKeyboardEvents.allowKeyPress(screen).register((_screen, key, scancode, modifiers) -> {

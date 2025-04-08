@@ -17,10 +17,10 @@
 package net.fabricmc.fabric.test.screen;
 
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.gl.RenderPipelines;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.narration.NarrationMessageBuilder;
 import net.minecraft.client.gui.widget.PressableWidget;
-import net.minecraft.client.render.RenderLayer;
 import net.minecraft.text.Text;
 
 class StopSoundButton extends PressableWidget {
@@ -30,7 +30,7 @@ class StopSoundButton extends PressableWidget {
 
 	@Override
 	protected void renderWidget(DrawContext drawContext, int mouseX, int mouseY, float delta) {
-		drawContext.drawGuiTexture(RenderLayer::getGuiTextured, ScreenTests.ARMOR_FULL_TEXTURE, this.getX(), this.getY(), this.width, this.height);
+		drawContext.drawGuiTexture(RenderPipelines.GUI_TEXTURED, ScreenTests.ARMOR_FULL_TEXTURE, this.getX(), this.getY(), this.width, this.height);
 
 		if (this.isHovered()) {
 			drawContext.drawTooltip(MinecraftClient.getInstance().textRenderer, Text.literal("Click to stop all sounds"), this.getX(), this.getY());
