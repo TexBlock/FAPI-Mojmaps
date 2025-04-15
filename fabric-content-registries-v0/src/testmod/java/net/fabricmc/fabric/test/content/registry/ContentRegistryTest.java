@@ -194,8 +194,8 @@ public final class ContentRegistryTest implements ModInitializer {
 		 * This testmod uses an accessor due to Loom limitations that prevent TAWs from applying across Gradle subproject boundaries */
 		FabricBrewingRecipeRegistryBuilder.BUILD.register(builder -> {
 			builder.registerPotionType(dirtyPotion);
-			builder.registerItemRecipe(Items.POTION, Ingredient.fromTag(Registries.ITEM.getOrThrow(ItemTags.DIRT)), dirtyPotion);
-			builder.registerPotionRecipe(Potions.AWKWARD, Ingredient.fromTag(Registries.ITEM.getOrThrow(ItemTags.SMALL_FLOWERS)), Potions.HEALING);
+			builder.registerItemRecipe(Items.POTION, Ingredient.ofTag(Registries.ITEM.getOrThrow(ItemTags.DIRT)), dirtyPotion);
+			builder.registerPotionRecipe(Potions.AWKWARD, Ingredient.ofTag(Registries.ITEM.getOrThrow(ItemTags.SMALL_FLOWERS)), Potions.HEALING);
 
 			if (builder.getEnabledFeatures().contains(FeatureFlags.REDSTONE_EXPERIMENTS)) {
 				builder.registerPotionRecipe(Potions.AWKWARD, Ingredient.ofItems(Items.BUNDLE), Potions.LUCK);

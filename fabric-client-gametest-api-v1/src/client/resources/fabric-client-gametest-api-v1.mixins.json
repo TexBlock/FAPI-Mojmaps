@@ -8,7 +8,7 @@
     "ClientWorldAccessor",
     "CyclingButtonWidgetAccessor",
     "ScreenAccessor",
-    "input.GlResourceManagerMixin",
+    "input.GlCommandEncoderMixin",
     "input.InputUtilMixin",
     "input.KeyBindingAccessor",
     "input.KeyboardAccessor",

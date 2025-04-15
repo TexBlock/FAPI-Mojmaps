@@ -184,7 +184,7 @@ public final class ModResourcePackUtil {
 		switch (filename) {
 		case "pack.mcmeta":
 			String description = Objects.requireNonNullElse(container.getMetadata().getId(), "");
-			String metadata = serializeMetadata(SharedConstants.getGameVersion().method_70592(type), description);
+			String metadata = serializeMetadata(SharedConstants.getGameVersion().packVersion(type), description);
 			return IOUtils.toInputStream(metadata, Charsets.UTF_8);
 		case "pack.png":
 			Optional<Path> path = container.getMetadata().getIconPath(512).flatMap(container::findPath);

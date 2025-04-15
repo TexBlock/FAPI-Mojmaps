@@ -18,7 +18,6 @@ package net.fabricmc.fabric.test.transfer.ingame.client;
 
 import java.util.List;
 
-import net.minecraft.class_11227;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gl.RenderPipelines;
@@ -54,7 +53,7 @@ public class FluidVariantRenderTest implements ClientModInitializer {
 				Sprite[] sprites = FluidVariantRendering.getSprites(variant);
 				int color = FluidVariantRendering.getColor(variant, player.getWorld(), player.getBlockPos());
 
-				drawContext.method_70850(class_11227.SCREEN_TOOLTIP);
+				drawContext.method_71046();
 
 				if (sprites != null) {
 					drawContext.drawSpriteStretched(RenderPipelines.GUI_TEXTURED, sprites[0], 0, renderY, 16, 16, color);
@@ -73,7 +72,7 @@ public class FluidVariantRenderTest implements ClientModInitializer {
 					drawContext.drawTooltip(textRenderer, line, -8, renderY);
 				}
 
-				drawContext.method_70860();
+				drawContext.method_71050();
 			}
 		});
 	}

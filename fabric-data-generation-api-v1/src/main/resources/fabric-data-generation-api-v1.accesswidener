@@ -97,8 +97,8 @@ transitive-accessible	method	net/minecraft/data/recipe/RecipeGenerator	offerCarp
 transitive-accessible	method	net/minecraft/data/recipe/RecipeGenerator	offerBedRecipe	(Lnet/minecraft/item/ItemConvertible;Lnet/minecraft/item/ItemConvertible;)V
 transitive-accessible	method	net/minecraft/data/recipe/RecipeGenerator	offerBannerRecipe	(Lnet/minecraft/item/ItemConvertible;Lnet/minecraft/item/ItemConvertible;)V
 transitive-accessible	method	net/minecraft/data/recipe/RecipeGenerator	offerStainedGlassDyeingRecipe	(Lnet/minecraft/item/ItemConvertible;Lnet/minecraft/item/ItemConvertible;)V
-transitive-accessible	method	net/minecraft/data/recipe/RecipeGenerator	method_70962	(Lnet/minecraft/item/ItemConvertible;)V
-transitive-accessible	method	net/minecraft/data/recipe/RecipeGenerator	method_70963	(Lnet/minecraft/item/ItemConvertible;Lnet/minecraft/item/ItemConvertible;)V
+transitive-accessible	method	net/minecraft/data/recipe/RecipeGenerator	offerDriedGhast	(Lnet/minecraft/item/ItemConvertible;)V
+transitive-accessible	method	net/minecraft/data/recipe/RecipeGenerator	offerHarness	(Lnet/minecraft/item/ItemConvertible;Lnet/minecraft/item/ItemConvertible;)V
 transitive-accessible	method	net/minecraft/data/recipe/RecipeGenerator	offerStainedGlassPaneRecipe	(Lnet/minecraft/item/ItemConvertible;Lnet/minecraft/item/ItemConvertible;)V
 transitive-accessible	method	net/minecraft/data/recipe/RecipeGenerator	offerStainedGlassPaneDyeingRecipe	(Lnet/minecraft/item/ItemConvertible;Lnet/minecraft/item/ItemConvertible;)V
 transitive-accessible	method	net/minecraft/data/recipe/RecipeGenerator	offerTerracottaDyeingRecipe	(Lnet/minecraft/item/ItemConvertible;Lnet/minecraft/item/ItemConvertible;)V

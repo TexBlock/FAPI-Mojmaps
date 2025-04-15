@@ -16,8 +16,6 @@
 
 package net.fabricmc.fabric.test.rendering.client;
 
-import com.mojang.blaze3d.systems.RenderSystem;
-
 import net.minecraft.block.Blocks;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.OverlayTexture;
@@ -63,8 +61,6 @@ public class WorldRenderEventsTests implements ClientModInitializer {
 
 		matrices.push();
 		matrices.translate(-camera.x, -camera.y, -camera.z);
-
-		RenderSystem.setShaderColor(1f, 1f, 1f, 1f);
 
 		VertexRendering.drawFilledBox(matrices, context.consumers().getBuffer(RenderLayer.getDebugFilledBox()), 0, 100, 0, 1, 101, 1, 0, 1, 0, 0.5f);
 
