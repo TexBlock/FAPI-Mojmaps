@@ -42,6 +42,7 @@ import net.minecraft.core.RegistryAccess;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtOps;
 import net.minecraft.nbt.Tag;
+import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.resources.RegistryOps;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.Bootstrap;
@@ -53,20 +54,30 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.BellBlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.ChestBlockEntity;
 import net.minecraft.world.level.chunk.LevelChunk;
 import net.minecraft.world.level.chunk.ProtoChunk;
 import net.fabricmc.fabric.api.attachment.v1.AttachmentRegistry;
+import net.fabricmc.fabric.api.attachment.v1.AttachmentSyncPredicate;
 import net.fabricmc.fabric.api.attachment.v1.AttachmentTarget;
 import net.fabricmc.fabric.api.attachment.v1.AttachmentType;
 import net.fabricmc.fabric.impl.attachment.AttachmentPersistentState;
 import net.fabricmc.fabric.impl.attachment.AttachmentSerializingImpl;
 import net.fabricmc.fabric.impl.attachment.AttachmentTargetImpl;
+import net.fabricmc.fabric.impl.attachment.sync.AttachmentChange;
+import net.fabricmc.fabric.impl.attachment.sync.AttachmentSyncException;
 
 public class CommonAttachmentTests {
 	private static final String MOD_ID = "example";
 	private static final AttachmentType<Integer> PERSISTENT = AttachmentRegistry.createPersistent(
 			ResourceLocation.fromNamespaceAndPath(MOD_ID, "persistent"),
 			Codec.INT
+	);
+	private static final AttachmentType<Integer> SYNCED = AttachmentRegistry.create(
+			ResourceLocation.fromNamespaceAndPath(MOD_ID, "synced"),
+			builder -> {
+				builder.syncWith(ByteBufCodecs.INT, AttachmentSyncPredicate.all());
+			}
 	);
 
 	private static final AttachmentType<WheelInfo> WHEEL = AttachmentRegistry.create(ResourceLocation.fromNamespaceAndPath(AttachmentTestMod.MOD_ID, "wheel_info"),
@@ -255,6 +266,25 @@ public class CommonAttachmentTests {
 		AttachmentPersistentState.read(world, fakeSave, mockDRM());
 		assertTrue(world.hasAttached(PERSISTENT));
 		assertEquals(expected, world.getAttached(PERSISTENT));
+	}
+
+	@Test
+	void applyToInvalidTarget() {
+		RegistryAccess drm = mockDRM();
+
+		ServerLevel world = mock(ServerLevel.class);
+		when(world.registryAccess()).thenReturn(drm);
+		when(world.dimension()).thenReturn(Level.END);
+
+		BlockEntity blockEntity = new ChestBlockEntity(BlockPos.ZERO, Blocks.CHEST.defaultBlockState());
+
+		AttachmentChange attachmentChange = new AttachmentChange(
+				((AttachmentTargetImpl) blockEntity).fabric_getSyncTargetInfo(),
+				SYNCED,
+				new byte[]{0}
+		);
+
+		assertThrows(AttachmentSyncException.class, () -> attachmentChange.tryApply(world));
 	}
 
 	/*
