@@ -340,11 +340,11 @@ transitive-accessible method net/minecraft/client/render/RenderLayer$MultiPhaseP
 transitive-accessible method net/minecraft/client/render/RenderLayer$MultiPhaseParameters$Builder build (Lnet/minecraft/client/render/RenderLayer$OutlineMode;)Lnet/minecraft/client/render/RenderLayer$MultiPhaseParameters;
 
 # private fields of RenderPipelines
-transitive-accessible field net/minecraft/client/gl/RenderPipelines field_60125 Lcom/mojang/blaze3d/pipeline/RenderPipeline$Snippet;
+transitive-accessible field net/minecraft/client/gl/RenderPipelines TRANSFORMS_AND_PROJECTION_SNIPPET Lcom/mojang/blaze3d/pipeline/RenderPipeline$Snippet;
 transitive-accessible field net/minecraft/client/gl/RenderPipelines FOG_SNIPPET Lcom/mojang/blaze3d/pipeline/RenderPipeline$Snippet;
-transitive-accessible field net/minecraft/client/gl/RenderPipelines field_60126 Lcom/mojang/blaze3d/pipeline/RenderPipeline$Snippet;
-transitive-accessible field net/minecraft/client/gl/RenderPipelines field_60127 Lcom/mojang/blaze3d/pipeline/RenderPipeline$Snippet;
-transitive-accessible field net/minecraft/client/gl/RenderPipelines field_60128 Lcom/mojang/blaze3d/pipeline/RenderPipeline$Snippet;
+transitive-accessible field net/minecraft/client/gl/RenderPipelines GLOBALS_SNIPPET Lcom/mojang/blaze3d/pipeline/RenderPipeline$Snippet;
+transitive-accessible field net/minecraft/client/gl/RenderPipelines TRANSFORMS_PROJECTION_FOG_SNIPPET Lcom/mojang/blaze3d/pipeline/RenderPipeline$Snippet;
+transitive-accessible field net/minecraft/client/gl/RenderPipelines TRANSFORMS_PROJECTION_FOG_LIGHTING_SNIPPET Lcom/mojang/blaze3d/pipeline/RenderPipeline$Snippet;
 transitive-accessible field net/minecraft/client/gl/RenderPipelines TERRAIN_SNIPPET Lcom/mojang/blaze3d/pipeline/RenderPipeline$Snippet;
 transitive-accessible field net/minecraft/client/gl/RenderPipelines ENTITY_SNIPPET Lcom/mojang/blaze3d/pipeline/RenderPipeline$Snippet;
 transitive-accessible field net/minecraft/client/gl/RenderPipelines RENDERTYPE_BEACON_BEAM_SNIPPET Lcom/mojang/blaze3d/pipeline/RenderPipeline$Snippet;
