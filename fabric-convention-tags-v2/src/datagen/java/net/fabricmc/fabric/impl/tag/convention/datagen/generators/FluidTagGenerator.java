@@ -26,25 +26,25 @@ import net.fabricmc.fabric.api.datagen.v1.provider.FabricTagProvider;
 import net.fabricmc.fabric.api.tag.convention.v2.ConventionalFluidTags;
 
 public final class FluidTagGenerator extends FabricTagProvider.FluidTagProvider {
-	public FluidTagGenerator(FabricDataOutput output, CompletableFuture<RegistryWrapper.WrapperLookup> completableFuture) {
-		super(output, completableFuture);
+	public FluidTagGenerator(FabricDataOutput output, CompletableFuture<RegistryWrapper.WrapperLookup> registriesFuture) {
+		super(output, registriesFuture);
 	}
 
 	@Override
 	protected void configure(RegistryWrapper.WrapperLookup registries) {
-		getOrCreateTagBuilder(ConventionalFluidTags.WATER)
+		valueLookupBuilder(ConventionalFluidTags.WATER)
 				.addOptionalTag(FluidTags.WATER);
-		getOrCreateTagBuilder(ConventionalFluidTags.LAVA)
+		valueLookupBuilder(ConventionalFluidTags.LAVA)
 				.addOptionalTag(FluidTags.LAVA);
-		getOrCreateTagBuilder(ConventionalFluidTags.MILK);
-		getOrCreateTagBuilder(ConventionalFluidTags.HONEY);
-		getOrCreateTagBuilder(ConventionalFluidTags.GASEOUS);
-		getOrCreateTagBuilder(ConventionalFluidTags.EXPERIENCE);
-		getOrCreateTagBuilder(ConventionalFluidTags.POTION);
-		getOrCreateTagBuilder(ConventionalFluidTags.SUSPICIOUS_STEW);
-		getOrCreateTagBuilder(ConventionalFluidTags.MUSHROOM_STEW);
-		getOrCreateTagBuilder(ConventionalFluidTags.RABBIT_STEW);
-		getOrCreateTagBuilder(ConventionalFluidTags.BEETROOT_SOUP);
-		getOrCreateTagBuilder(ConventionalFluidTags.HIDDEN_FROM_RECIPE_VIEWERS);
+		valueLookupBuilder(ConventionalFluidTags.MILK);
+		valueLookupBuilder(ConventionalFluidTags.HONEY);
+		valueLookupBuilder(ConventionalFluidTags.GASEOUS);
+		valueLookupBuilder(ConventionalFluidTags.EXPERIENCE);
+		valueLookupBuilder(ConventionalFluidTags.POTION);
+		valueLookupBuilder(ConventionalFluidTags.SUSPICIOUS_STEW);
+		valueLookupBuilder(ConventionalFluidTags.MUSHROOM_STEW);
+		valueLookupBuilder(ConventionalFluidTags.RABBIT_STEW);
+		valueLookupBuilder(ConventionalFluidTags.BEETROOT_SOUP);
+		valueLookupBuilder(ConventionalFluidTags.HIDDEN_FROM_RECIPE_VIEWERS);
 	}
 }

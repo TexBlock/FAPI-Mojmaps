@@ -18,39 +18,42 @@ package net.fabricmc.fabric.impl.tag.convention.datagen.generators;
 
 import java.util.concurrent.CompletableFuture;
 
+import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.Enchantments;
+import net.minecraft.registry.RegistryKeys;
 import net.minecraft.registry.RegistryWrapper;
+import net.minecraft.registry.tag.TagKey;
 import net.minecraft.util.Identifier;
 
 import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput;
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricTagProvider;
 import net.fabricmc.fabric.api.tag.convention.v2.ConventionalEnchantmentTags;
 
-public final class EnchantmentTagGenerator extends FabricTagProvider.EnchantmentTagProvider {
+public final class EnchantmentTagGenerator extends FabricTagProvider<Enchantment> {
 	public EnchantmentTagGenerator(FabricDataOutput output, CompletableFuture<RegistryWrapper.WrapperLookup> registriesFuture) {
-		super(output, registriesFuture);
+		super(output, RegistryKeys.ENCHANTMENT, registriesFuture);
 	}
 
 	@Override
 	protected void configure(RegistryWrapper.WrapperLookup registries) {
-		getOrCreateTagBuilder(ConventionalEnchantmentTags.INCREASE_BLOCK_DROPS)
+		builder(ConventionalEnchantmentTags.INCREASE_BLOCK_DROPS)
 				.add(Enchantments.FORTUNE);
-		getOrCreateTagBuilder(ConventionalEnchantmentTags.INCREASE_ENTITY_DROPS)
+		builder(ConventionalEnchantmentTags.INCREASE_ENTITY_DROPS)
 				.add(Enchantments.LOOTING);
-		getOrCreateTagBuilder(ConventionalEnchantmentTags.WEAPON_DAMAGE_ENHANCEMENTS)
+		builder(ConventionalEnchantmentTags.WEAPON_DAMAGE_ENHANCEMENTS)
 				.add(Enchantments.SHARPNESS)
 				.add(Enchantments.SMITE)
 				.add(Enchantments.BANE_OF_ARTHROPODS)
 				.add(Enchantments.POWER)
 				.add(Enchantments.IMPALING);
-		getOrCreateTagBuilder(ConventionalEnchantmentTags.ENTITY_SPEED_ENHANCEMENTS)
+		builder(ConventionalEnchantmentTags.ENTITY_SPEED_ENHANCEMENTS)
 				.add(Enchantments.SOUL_SPEED)
 				.add(Enchantments.SWIFT_SNEAK)
 				.add(Enchantments.DEPTH_STRIDER);
-		getOrCreateTagBuilder(ConventionalEnchantmentTags.ENTITY_AUXILIARY_MOVEMENT_ENHANCEMENTS)
+		builder(ConventionalEnchantmentTags.ENTITY_AUXILIARY_MOVEMENT_ENHANCEMENTS)
 				.add(Enchantments.FEATHER_FALLING)
 				.add(Enchantments.FROST_WALKER);
-		getOrCreateTagBuilder(ConventionalEnchantmentTags.ENTITY_DEFENSE_ENHANCEMENTS)
+		builder(ConventionalEnchantmentTags.ENTITY_DEFENSE_ENHANCEMENTS)
 				.add(Enchantments.PROTECTION)
 				.add(Enchantments.BLAST_PROTECTION)
 				.add(Enchantments.PROJECTILE_PROTECTION)
@@ -60,9 +63,9 @@ public final class EnchantmentTagGenerator extends FabricTagProvider.Enchantment
 
 		// Backwards compat with pre-1.21 tags. Done after so optional tag is last for better readability.
 		// TODO: Remove backwards compat tag entries in 1.22
-		getOrCreateTagBuilder(ConventionalEnchantmentTags.ENTITY_SPEED_ENHANCEMENTS)
-				.addOptionalTag(Identifier.of("c", "entity_movement_enhancement"));
-		getOrCreateTagBuilder(ConventionalEnchantmentTags.ENTITY_DEFENSE_ENHANCEMENTS)
-				.addOptionalTag(Identifier.of("c", "entity_defense_enhancement"));
+		builder(ConventionalEnchantmentTags.ENTITY_SPEED_ENHANCEMENTS)
+				.addOptionalTag(TagKey.of(RegistryKeys.ENCHANTMENT, Identifier.of("c", "entity_movement_enhancement")));
+		builder(ConventionalEnchantmentTags.ENTITY_DEFENSE_ENHANCEMENTS)
+				.addOptionalTag(TagKey.of(RegistryKeys.ENCHANTMENT, Identifier.of("c", "entity_defense_enhancement")));
 	}
 }

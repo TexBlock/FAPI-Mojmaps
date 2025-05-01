@@ -40,7 +40,10 @@ import net.minecraft.network.codec.PacketCodec;
 import net.minecraft.network.codec.PacketCodecs;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.Registry;
+import net.minecraft.storage.NbtReadView;
+import net.minecraft.storage.NbtWriteView;
 import net.minecraft.text.Text;
+import net.minecraft.util.ErrorReporter;
 import net.minecraft.util.Identifier;
 
 import net.fabricmc.fabric.api.transfer.v1.context.ContainerItemContext;
@@ -128,9 +131,9 @@ public class SingleVariantItemStorageTests extends AbstractTransferApiTest {
 			tx.commit();
 		}
 
-		NbtCompound nbt = new NbtCompound();
-		storage.writeNbt(nbt, staticDrm());
-		assertEquals("{amount:1L,variant:{item:\"minecraft:diamond\"}}", nbt.toString());
+		NbtWriteView writeView = NbtWriteView.create(null);
+		storage.writeData(writeView);
+		assertEquals("{amount:1L,variant:{item:\"minecraft:diamond\"}}", writeView.getNbt().toString());
 	}
 
 	@Test
@@ -149,9 +152,9 @@ public class SingleVariantItemStorageTests extends AbstractTransferApiTest {
 			tx.commit();
 		}
 
-		NbtCompound nbt = new NbtCompound();
-		storage.writeNbt(nbt, staticDrm());
-		assertEquals("{amount:1L,variant:{components:{\"minecraft:custom_name\":\"test name\"},item:\"minecraft:diamond\"}}", nbt.toString());
+		NbtWriteView writeView = NbtWriteView.create(null);
+		storage.writeData(writeView);
+		assertEquals("{amount:1L,variant:{components:{\"minecraft:custom_name\":\"test name\"},item:\"minecraft:diamond\"}}", writeView.getNbt().toString());
 	}
 
 	@Test
@@ -170,7 +173,7 @@ public class SingleVariantItemStorageTests extends AbstractTransferApiTest {
 		nbt.putLong("amount", 1);
 		nbt.put("variant", variantNbt);
 
-		storage.readNbt(nbt, staticDrm());
+		storage.readData(NbtReadView.get(null, staticDrm(), nbt));
 
 		try (Transaction tx = Transaction.openOuter()) {
 			assertEquals(1L, storage.extract(ItemVariant.of(Items.DIAMOND), 1, tx));
@@ -194,7 +197,7 @@ public class SingleVariantItemStorageTests extends AbstractTransferApiTest {
 		nbt.putLong("amount", 1);
 		nbt.put("variant", variantNbt);
 
-		storage.readNbt(nbt, staticDrm());
+		storage.readData(NbtReadView.get(ErrorReporter.EMPTY, staticDrm(), nbt));
 
 		try (Transaction tx = Transaction.openOuter()) {
 			assertEquals(0L, storage.extract(ItemVariant.of(Items.DIAMOND), 1, tx));
