@@ -176,7 +176,7 @@ fun setupMappedBranch(sGit: Git) {
 
     logger.debug("Remapping upstream sources using Gradle")
     // Invoke gradle remap
-    runCommand("gradlew.bat", "remapUpstreamSources")
+    runCommand("./gradlew", "remapUpstreamSources")
 
     logger.info("Creating branch $tempMappedBranch")
     sGit.checkout()
@@ -222,11 +222,11 @@ fun updateToCommit(sGit: Git, commit: RevCommit, remappableProjects: List<String
     if (mappedSourcesDir.exists()) mappedSourcesDir.deleteRecursively()
     if (remappableProjects.isEmpty()) {
         logger.info("- Remapping all projects")
-        runCommand("gradlew.bat", "remapUpstreamSources")
+        runCommand("./gradlew", "remapUpstreamSources")
     } else {
         logger.info("- Remapping ${remappableProjects.size} projects")
         val tasks = remappableProjects.map { CaseFormat.LOWER_HYPHEN.to(CaseFormat.UPPER_CAMEL, it) }.map { "remap${it}UpstreamSources" }
-        runCommand(*(arrayOf("gradlew.bat") + tasks))
+        runCommand(*(arrayOf("./gradlew") + tasks))
     }
 
     // Checkout mojmap branch
@@ -386,7 +386,7 @@ fun updateMappings(sGit: Git) {
     // Remap sources
     logger.info("Remapping yarn sources using Gradle")
     if (mappedSourcesDir.exists()) mappedSourcesDir.deleteRecursively()
-    runCommand("gradlew.bat", "remapUpstreamSources")
+    runCommand("./gradlew", "remapUpstreamSources")
 
     // Checkout mojmap branch
     logger.info("Checking out branch $tempMappedBranch")
@@ -421,11 +421,11 @@ fun setupTask() {
     val customProperty = "custom"
     val interfacesProperty = "loom:injected_interfaces"
     val architecturyCommonJson = File("src/generated/resources/architectury.common.json")
-    
+
     setupOnSubmoduleBranch()
-    
+
     val foundInterfaces = mutableMapOf<String, MutableSet<String>>()
-    
+
     logger.info("Looking for injected interfaces...")
     (submoduleDir.listFiles() ?: emptyArray())
         .filter { it.name.startsWith("fabric-") }
@@ -441,7 +441,7 @@ fun setupTask() {
                 val json = mod.bufferedReader().use(JsonParser::parseReader).asJsonObject
                 val custom = json.getAsJsonObject(customProperty)?.asJsonObject ?: return@readFile
                 val interfaces = custom.getAsJsonObject(interfacesProperty)?.asJsonObject ?: return@readFile
-    
+
                 logger.info("Adding injected interfaces from project ${proj.name}")
                 interfaces.entrySet().forEach { (key, value) ->
                     val list = foundInterfaces.getOrPut(key, ::mutableSetOf)
@@ -449,14 +449,14 @@ fun setupTask() {
                 }
             }
         }
-    
+
     foundInterfaces.forEach { (t, u) ->
         logger.info("Class $t")
         u.forEach { logger.info("\t $it") }
     }
-    
+
     data class ArchitecturyCommonJson(val injectedInterfaces: Map<String, MutableSet<String>>)
-    
+
     logger.info("Writing architectury.common.json")
     architecturyCommonJson.parentFile.mkdirs()
     val gson: Gson = GsonBuilder().setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES).setPrettyPrinting().create()
