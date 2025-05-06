@@ -30,6 +30,8 @@ import net.minecraft.server.world.ServerWorld;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.chunk.ChunkStatus;
 
+import net.fabricmc.fabric.api.event.Event;
+
 /**
  * Marks all objects on which data can be attached using {@link AttachmentType}s.
  *
@@ -220,6 +222,18 @@ public interface AttachmentTarget {
 	}
 
 	/**
+	 * Provides an {@link Event} that lets the listener know when the target has its {@link AttachmentType} attachment changed.
+	 *
+	 * <p>The event is called after the attachment was changed, be aware of the potential of recursion if you intend on calling {@link #setAttached} on the target.
+	 *
+	 * @param type the attachment type
+	 * @return event associated with this target and attachment type
+	 */
+	default <A> Event<OnAttachedSet<A>> onAttachedSet(AttachmentType<A> type) {
+		throw new UnsupportedOperationException("Implemented via mixin");
+	}
+
+	/**
 	 * Modifies the data associated with the given {@link AttachmentType}. Functionally the same as calling {@link #getAttached(AttachmentType)},
 	 * applying the modifier, then calling {@link #setAttached(AttachmentType, Object)} with the result. The modifier
 	 * takes in the currently attached value, or {@code null} if no attachment is present.
@@ -232,5 +246,17 @@ public interface AttachmentTarget {
 	@Nullable
 	default <A> A modifyAttached(AttachmentType<A> type, UnaryOperator<A> modifier) {
 		return setAttached(type, modifier.apply(getAttached(type)));
+	}
+
+	@FunctionalInterface
+	interface OnAttachedSet<A> {
+		/**
+		 * Called after the attachment is set on this target.
+		 *
+		 * @see AttachmentTarget#onAttachedSet(AttachmentType)
+		 * @param oldValue attachment value on the target prior to it being set
+		 * @param newValue attachment value on the target after it was set
+		 */
+		void onAttachedSet(@Nullable A oldValue, @Nullable A newValue);
 	}
 }

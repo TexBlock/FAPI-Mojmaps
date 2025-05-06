@@ -20,6 +20,7 @@ import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
+import java.util.function.Function;
 
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
@@ -36,6 +37,8 @@ import net.minecraft.world.World;
 import net.minecraft.world.chunk.Chunk;
 
 import net.fabricmc.fabric.api.attachment.v1.AttachmentType;
+import net.fabricmc.fabric.api.event.Event;
+import net.fabricmc.fabric.api.event.EventFactory;
 import net.fabricmc.fabric.impl.attachment.AttachmentSerializingImpl;
 import net.fabricmc.fabric.impl.attachment.AttachmentTargetImpl;
 import net.fabricmc.fabric.impl.attachment.AttachmentTypeImpl;
@@ -48,6 +51,8 @@ abstract class AttachmentTargetsMixin implements AttachmentTargetImpl {
 	private IdentityHashMap<AttachmentType<?>, Object> fabric_dataAttachments = null;
 	@Nullable
 	private IdentityHashMap<AttachmentType<?>, AttachmentChange> fabric_syncedAttachments = null;
+	@Nullable
+	private IdentityHashMap<AttachmentType<?>, Event<OnAttachedSet<?>>> fabric_attachedChangedListeners = null;
 
 	@SuppressWarnings("unchecked")
 	@Override
@@ -68,24 +73,51 @@ abstract class AttachmentTargetsMixin implements AttachmentTargetImpl {
 			this.fabric_syncChange(type, new AttachmentSyncPayloadS2C(List.of(change)));
 		}
 
+		T oldValue;
+
 		if (value == null) {
 			if (fabric_dataAttachments == null) {
-				return null;
+				oldValue = null;
 			}
 
-			return (T) fabric_dataAttachments.remove(type);
+			oldValue = (T) fabric_dataAttachments.remove(type);
 		} else {
 			if (fabric_dataAttachments == null) {
 				fabric_dataAttachments = new IdentityHashMap<>();
 			}
 
-			return (T) fabric_dataAttachments.put(type, value);
+			oldValue = (T) fabric_dataAttachments.put(type, value);
 		}
+
+		if (fabric_attachedChangedListeners != null) {
+			Event<OnAttachedSet<T>> event = (Event<OnAttachedSet<T>>) (Event<?>) fabric_attachedChangedListeners.get(type);
+
+			if (event != null) {
+				event.invoker().onAttachedSet(oldValue, value);
+			}
+		}
+
+		return oldValue;
 	}
 
 	@Override
 	public boolean hasAttached(AttachmentType<?> type) {
 		return fabric_dataAttachments != null && fabric_dataAttachments.containsKey(type);
+	}
+
+	@Override
+	public <A> Event<OnAttachedSet<A>> onAttachedSet(AttachmentType<A> type) {
+		if (fabric_attachedChangedListeners == null) {
+			fabric_attachedChangedListeners = new IdentityHashMap<>();
+		}
+
+		return (Event<OnAttachedSet<A>>) (Event<?>) fabric_attachedChangedListeners.computeIfAbsent(type, t -> {
+			return (Event<OnAttachedSet<?>>) (Event<?>) EventFactory.createArrayBacked(OnAttachedSet.class, (Function<OnAttachedSet<A>[], OnAttachedSet<A>>) listeners -> (oldValue, newValue) -> {
+				for (OnAttachedSet<A> listener : listeners) {
+					listener.onAttachedSet(oldValue, newValue);
+				}
+			});
+		});
 	}
 
 	@Override

@@ -31,6 +31,7 @@ import net.minecraft.registry.RegistryKeys;
 import net.minecraft.text.Text;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Identifier;
+import net.minecraft.util.dynamic.Codecs;
 import net.minecraft.world.gen.GenerationStep;
 import net.minecraft.world.gen.feature.DefaultFeatureConfig;
 
@@ -40,6 +41,7 @@ import net.fabricmc.fabric.api.attachment.v1.AttachmentSyncPredicate;
 import net.fabricmc.fabric.api.attachment.v1.AttachmentType;
 import net.fabricmc.fabric.api.biome.v1.BiomeModifications;
 import net.fabricmc.fabric.api.biome.v1.BiomeSelectors;
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerEntityEvents;
 import net.fabricmc.fabric.api.event.player.UseBlockCallback;
 
 public class AttachmentTestMod implements ModInitializer {
@@ -87,6 +89,12 @@ public class AttachmentTestMod implements ModInitializer {
 					.persistent(ItemStack.CODEC)
 					.syncWith(ItemStack.OPTIONAL_PACKET_CODEC, AttachmentSyncPredicate.all())
 	);
+	public static final AttachmentType<Integer> SYNCED_RENDER_DISTANCE = AttachmentRegistry.create(
+			Identifier.of(MOD_ID, "synced_render_distance"),
+			builder -> builder
+					.persistent(Codecs.NON_NEGATIVE_INT)
+					.syncWith(PacketCodecs.INTEGER, AttachmentSyncPredicate.targetOnly())
+	);
 
 	@Override
 	public void onInitialize() {
@@ -110,6 +118,14 @@ public class AttachmentTestMod implements ModInitializer {
 			}
 
 			return ActionResult.PASS;
+		});
+
+		ServerEntityEvents.ENTITY_LOAD.register((entity, world) -> {
+			entity.onAttachedSet(SYNCED_ITEM).register((oldValue, newValue) -> {
+				if (newValue != null && !newValue.equals(oldValue) && newValue.isOf(Items.BRICK)) {
+					entity.damage(world, world.getDamageSources().generic(), 1);
+				}
+			});
 		});
 	}
 }
