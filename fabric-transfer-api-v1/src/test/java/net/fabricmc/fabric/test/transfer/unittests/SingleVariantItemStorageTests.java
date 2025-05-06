@@ -173,7 +173,7 @@ public class SingleVariantItemStorageTests extends AbstractTransferApiTest {
 		nbt.putLong("amount", 1);
 		nbt.put("variant", variantNbt);
 
-		storage.readData(NbtReadView.get(null, staticDrm(), nbt));
+		storage.readData(NbtReadView.create(ErrorReporter.EMPTY, staticDrm(), nbt));
 
 		try (Transaction tx = Transaction.openOuter()) {
 			assertEquals(1L, storage.extract(ItemVariant.of(Items.DIAMOND), 1, tx));
@@ -197,7 +197,7 @@ public class SingleVariantItemStorageTests extends AbstractTransferApiTest {
 		nbt.putLong("amount", 1);
 		nbt.put("variant", variantNbt);
 
-		storage.readData(NbtReadView.get(ErrorReporter.EMPTY, staticDrm(), nbt));
+		storage.readData(NbtReadView.create(ErrorReporter.EMPTY, staticDrm(), nbt));
 
 		try (Transaction tx = Transaction.openOuter()) {
 			assertEquals(0L, storage.extract(ItemVariant.of(Items.DIAMOND), 1, tx));

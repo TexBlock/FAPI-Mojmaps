@@ -79,7 +79,7 @@ public final class ServerPlayNetworkAddon extends AbstractChanneledNetworkAddon<
 
 	@Override
 	protected void schedule(Runnable task) {
-		this.handler.player.server.execute(task);
+		this.handler.player.getServer().execute(task);
 	}
 
 	@Override

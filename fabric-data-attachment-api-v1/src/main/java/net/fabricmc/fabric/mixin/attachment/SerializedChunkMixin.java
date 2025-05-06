@@ -80,7 +80,7 @@ abstract class SerializedChunkMixin {
 			nbt.put(AttachmentTarget.NBT_ATTACHMENT_KEY, attachmentNbtData);
 
 			try (ErrorReporter.Logging reporter = new ErrorReporter.Logging(LOGGER)) {
-				ReadView readView = NbtReadView.get(reporter, serverWorld.getRegistryManager(), nbt);
+				ReadView readView = NbtReadView.create(reporter, serverWorld.getRegistryManager(), nbt);
 				((AttachmentTargetImpl) chunk).fabric_readAttachmentsFromNbt(readView);
 			}
 		}

@@ -173,7 +173,7 @@ public class CommonAttachmentTests {
 		assertTrue(view.getNbt().contains(AttachmentTarget.NBT_ATTACHMENT_KEY));
 		assertTrue(view.getNbt().getCompound(AttachmentTarget.NBT_ATTACHMENT_KEY).orElseThrow().contains(dummy.identifier().toString()));
 
-		map = AttachmentSerializingImpl.deserializeAttachmentData(NbtReadView.get(ErrorReporter.EMPTY, drm, view.getNbt()));
+		map = AttachmentSerializingImpl.deserializeAttachmentData(NbtReadView.create(ErrorReporter.EMPTY, drm, view.getNbt()));
 		assertEquals(1, map.size());
 		Map.Entry<AttachmentType<?>, Object> entry = map.entrySet().stream().findFirst().orElseThrow();
 		// in this case the key should be the exact same object
@@ -188,7 +188,7 @@ public class CommonAttachmentTests {
 		assertNull(AttachmentSerializingImpl.deserializeAttachmentData(null));
 
 		nbt.put(Identifier.ofVanilla("test").toString(), new NbtCompound());
-		assertNull(AttachmentSerializingImpl.deserializeAttachmentData(NbtReadView.get(ErrorReporter.EMPTY, mockDRM(), nbt)));
+		assertNull(AttachmentSerializingImpl.deserializeAttachmentData(NbtReadView.create(ErrorReporter.EMPTY, mockDRM(), nbt)));
 	}
 
 	@Test
@@ -240,7 +240,7 @@ public class CommonAttachmentTests {
 
 		entity = new MarkerEntity(EntityType.MARKER, mockWorld); // fresh object, like on restart
 		entity.setChangeListener(mock());
-		entity.readData(NbtReadView.get(ErrorReporter.EMPTY, drm, fakeSave.getNbt()));
+		entity.readData(NbtReadView.create(ErrorReporter.EMPTY, drm, fakeSave.getNbt()));
 		assertTrue(entity.hasAttached(PERSISTENT));
 		assertEquals(expected, entity.getAttached(PERSISTENT));
 	}

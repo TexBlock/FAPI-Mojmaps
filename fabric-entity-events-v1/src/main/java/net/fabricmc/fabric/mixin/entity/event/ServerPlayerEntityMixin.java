@@ -44,7 +44,6 @@ import net.minecraft.util.ActionResult;
 import net.minecraft.util.Unit;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
-import net.minecraft.world.World;
 
 import net.fabricmc.fabric.api.entity.event.v1.EntitySleepEvents;
 import net.fabricmc.fabric.api.entity.event.v1.ServerEntityCombatEvents;
@@ -55,7 +54,7 @@ import net.fabricmc.fabric.api.entity.event.v1.ServerPlayerEvents;
 @Mixin(ServerPlayerEntity.class)
 abstract class ServerPlayerEntityMixin extends LivingEntityMixin {
 	@Shadow
-	public abstract ServerWorld getServerWorld();
+	public abstract ServerWorld getWorld();
 
 	/**
 	 * Minecraft by default does not call Entity#onKilledOther for a ServerPlayerEntity being killed.
@@ -68,8 +67,8 @@ abstract class ServerPlayerEntityMixin extends LivingEntityMixin {
 
 		// If the damage source that killed the player was an entity, then fire the event.
 		if (attacker != null) {
-			attacker.onKilledOther(this.getServerWorld(), (ServerPlayerEntity) (Object) this);
-			ServerEntityCombatEvents.AFTER_KILLED_OTHER_ENTITY.invoker().afterKilledOtherEntity(this.getServerWorld(), attacker, (ServerPlayerEntity) (Object) this);
+			attacker.onKilledOther(this.getWorld(), (ServerPlayerEntity) (Object) this);
+			ServerEntityCombatEvents.AFTER_KILLED_OTHER_ENTITY.invoker().afterKilledOtherEntity(this.getWorld(), attacker, (ServerPlayerEntity) (Object) this);
 		}
 	}
 
@@ -83,7 +82,7 @@ abstract class ServerPlayerEntityMixin extends LivingEntityMixin {
 	 */
 	@Inject(method = "worldChanged(Lnet/minecraft/server/world/ServerWorld;)V", at = @At("TAIL"))
 	private void afterWorldChanged(ServerWorld origin, CallbackInfo ci) {
-		ServerEntityWorldChangeEvents.AFTER_PLAYER_CHANGE_WORLD.invoker().afterChangeWorld((ServerPlayerEntity) (Object) this, origin, this.getServerWorld());
+		ServerEntityWorldChangeEvents.AFTER_PLAYER_CHANGE_WORLD.invoker().afterChangeWorld((ServerPlayerEntity) (Object) this, origin, this.getWorld());
 	}
 
 	@Inject(method = "copyFrom", at = @At("TAIL"))
@@ -119,8 +118,8 @@ abstract class ServerPlayerEntityMixin extends LivingEntityMixin {
 		return result != ActionResult.PASS ? result.isAccepted() : vanillaResult;
 	}
 
-	@Redirect(method = "trySleep", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/World;isDay()Z"))
-	private boolean redirectDaySleepCheck(World world, BlockPos pos) {
+	@Redirect(method = "trySleep", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/world/ServerWorld;isDay()Z"))
+	private boolean redirectDaySleepCheck(ServerWorld world, BlockPos pos) {
 		boolean day = world.isDay();
 		ActionResult result = EntitySleepEvents.ALLOW_SLEEP_TIME.invoker().allowSleepTime((PlayerEntity) (Object) this, pos, !day);
 

@@ -87,7 +87,7 @@ transitive-accessible	method	net/minecraft/data/recipe/RecipeGenerator	createSta
 transitive-accessible	method	net/minecraft/data/recipe/RecipeGenerator	createTrapdoorRecipe	(Lnet/minecraft/item/ItemConvertible;Lnet/minecraft/recipe/Ingredient;)Lnet/minecraft/data/recipe/CraftingRecipeJsonBuilder;
 transitive-accessible	method	net/minecraft/data/recipe/RecipeGenerator	createSignRecipe	(Lnet/minecraft/item/ItemConvertible;Lnet/minecraft/recipe/Ingredient;)Lnet/minecraft/data/recipe/CraftingRecipeJsonBuilder;
 transitive-accessible	method	net/minecraft/data/recipe/RecipeGenerator	offerHangingSignRecipe	(Lnet/minecraft/item/ItemConvertible;Lnet/minecraft/item/ItemConvertible;)V
-transitive-accessible	method	net/minecraft/data/recipe/RecipeGenerator	offerDyeableRecipes	(Ljava/util/List;Ljava/util/List;Ljava/lang/String;)V
+transitive-accessible	method	net/minecraft/data/recipe/RecipeGenerator	offerDyeableRecipes	(Ljava/util/List;Ljava/util/List;Ljava/lang/String;Lnet/minecraft/recipe/book/RecipeCategory;)V
 transitive-accessible	method	net/minecraft/data/recipe/RecipeGenerator	offerDyeablesRecipes	(Ljava/util/List;Ljava/util/List;Lnet/minecraft/item/Item;Ljava/lang/String;Lnet/minecraft/recipe/book/RecipeCategory;)V
 transitive-accessible	method	net/minecraft/data/recipe/RecipeGenerator	offerCarpetRecipe	(Lnet/minecraft/item/ItemConvertible;Lnet/minecraft/item/ItemConvertible;)V
 transitive-accessible	method	net/minecraft/data/recipe/RecipeGenerator	offerBedRecipe	(Lnet/minecraft/item/ItemConvertible;Lnet/minecraft/item/ItemConvertible;)V

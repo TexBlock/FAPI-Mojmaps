@@ -66,7 +66,7 @@ public class AttachmentPersistentState extends PersistentState {
 			@Override
 			public <T> DataResult<Pair<AttachmentPersistentState, T>> decode(DynamicOps<T> ops, T input) {
 				try (ErrorReporter.Logging reporter = new ErrorReporter.Logging(reporterContext, LOGGER)) {
-					ReadView readView = NbtReadView.get(reporter, world.getRegistryManager(), (NbtCompound) ops.convertTo(NbtOps.INSTANCE, input));
+					ReadView readView = NbtReadView.create(reporter, world.getRegistryManager(), (NbtCompound) ops.convertTo(NbtOps.INSTANCE, input));
 					((AttachmentTargetImpl) world).fabric_readAttachmentsFromNbt(readView);
 					return DataResult.success(Pair.of(new AttachmentPersistentState(world), ops.empty()));
 				}
