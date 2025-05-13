@@ -21,6 +21,8 @@ import java.util.List;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gl.RenderPipelines;
+import net.minecraft.client.gui.tooltip.HoveredTooltipPositioner;
+import net.minecraft.client.gui.tooltip.TooltipComponent;
 import net.minecraft.client.texture.Sprite;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.fluid.Fluids;
@@ -67,7 +69,7 @@ public class FluidVariantRenderTest implements ClientModInitializer {
 
 				for (Text line : tooltip) {
 					renderY += 10;
-					drawContext.drawTooltip(textRenderer, line, -8, renderY);
+					drawContext.drawTooltipImmediately(textRenderer, List.of(TooltipComponent.of(line.asOrderedText())), -8, renderY, HoveredTooltipPositioner.INSTANCE, null);
 				}
 			}
 		});
