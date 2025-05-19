@@ -19,6 +19,7 @@ package net.fabricmc.fabric.mixin.attachment;
 import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
@@ -68,14 +69,6 @@ abstract class AttachmentTargetsMixin implements AttachmentTargetImpl {
 	@Override
 	@Nullable
 	public <T> T setAttached(AttachmentType<T> type, @Nullable T value) {
-		this.fabric_markChanged(type);
-
-		if (this.fabric_shouldTryToSync() && type.isSynced()) {
-			AttachmentChange change = AttachmentChange.create(fabric_getSyncTargetInfo(), type, value, fabric_getDynamicRegistryManager());
-			acknowledgeSyncedEntry(type, change);
-			this.fabric_syncChange(type, new AttachmentSyncPayloadS2C(List.of(change)));
-		}
-
 		T oldValue;
 
 		if (value == null) {
@@ -93,6 +86,16 @@ abstract class AttachmentTargetsMixin implements AttachmentTargetImpl {
 
 			if (event != null) {
 				event.invoker().onAttachedSet(oldValue, value);
+			}
+		}
+
+		if (!Objects.equals(oldValue, value)) {
+			this.fabric_markChanged(type);
+
+			if (this.fabric_shouldTryToSync() && type.isSynced()) {
+				AttachmentChange change = AttachmentChange.create(fabric_getSyncTargetInfo(), type, value, fabric_getDynamicRegistryManager());
+				acknowledgeSyncedEntry(type, change);
+				this.fabric_syncChange(type, new AttachmentSyncPayloadS2C(List.of(change)));
 			}
 		}
 
