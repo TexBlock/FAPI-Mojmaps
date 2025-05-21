@@ -27,7 +27,6 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import net.minecraft.block.Block;
 import net.minecraft.class_11515;
-import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.render.RenderLayers;
 import net.minecraft.fluid.Fluid;
 
@@ -37,7 +36,7 @@ import net.fabricmc.fabric.impl.blockrenderlayer.BlockRenderLayerMapImpl;
 public class RenderLayersMixin {
 	@Shadow
 	@Final
-	private static Map<Block, RenderLayer> BLOCKS;
+	private static Map<Block, class_11515> BLOCKS;
 	@Shadow
 	@Final
 	private static Map<Fluid, class_11515> field_60921;
