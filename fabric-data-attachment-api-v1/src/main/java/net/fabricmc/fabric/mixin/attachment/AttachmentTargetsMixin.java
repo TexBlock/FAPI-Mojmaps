@@ -131,7 +131,7 @@ abstract class AttachmentTargetsMixin implements AttachmentTargetImpl {
 	public void fabric_readAttachmentsFromNbt(ReadView view) {
 		// Note on player targets: no syncing can happen here as the networkHandler is still null
 		// Instead it is done on player join (see AttachmentSync)
-		IdentityHashMap<AttachmentType<?>, Object> fromNbt = AttachmentSerializingImpl.deserializeAttachmentData(nbt, wrapperLookup);
+		IdentityHashMap<AttachmentType<?>, Object> fromNbt = AttachmentSerializingImpl.deserializeAttachmentData(view);
 
 		// If the NBT is devoid of data attachments, treat it as a no-op, rather than wiping them out.
 		// Any changes to data attachments (including removals) post-load are done independently of this

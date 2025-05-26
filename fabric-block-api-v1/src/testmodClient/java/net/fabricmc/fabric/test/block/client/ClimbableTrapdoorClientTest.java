@@ -16,7 +16,7 @@
 
 package net.fabricmc.fabric.test.block.client;
 
-import net.minecraft.client.render.RenderLayer;
+import net.minecraft.class_11515;
 
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.blockrenderlayer.v1.BlockRenderLayerMap;
@@ -26,7 +26,7 @@ public final class ClimbableTrapdoorClientTest implements ClientModInitializer {
 	@Override
 	public void onInitializeClient() {
 		BlockRenderLayerMap.INSTANCE.putBlocks(
-				RenderLayer.getCutout(),
+				class_11515.CUTOUT,
 				ClimbableTrapdoorTest.customLadderBlock,
 				ClimbableTrapdoorTest.customNonLadderBlock
 		);

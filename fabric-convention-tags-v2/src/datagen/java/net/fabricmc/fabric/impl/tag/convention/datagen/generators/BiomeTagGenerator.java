@@ -341,19 +341,19 @@ public final class BiomeTagGenerator extends FabricTagProvider<Biome> {
 				.add(BiomeKeys.CRIMSON_FOREST);
 		builder(ConventionalBiomeTags.PRIMARY_WOOD_TYPE_WARPED)
 				.add(BiomeKeys.WARPED_FOREST);
-		builder(ConventionalBiomeTags.PRIMARY_WOOD_TYPE).addTags(
-				ConventionalBiomeTags.PRIMARY_WOOD_TYPE_OAK,
-				ConventionalBiomeTags.PRIMARY_WOOD_TYPE_BIRCH,
-				ConventionalBiomeTags.PRIMARY_WOOD_TYPE_SPRUCE,
-				ConventionalBiomeTags.PRIMARY_WOOD_TYPE_JUNGLE,
-				ConventionalBiomeTags.PRIMARY_WOOD_TYPE_ACACIA,
-				ConventionalBiomeTags.PRIMARY_WOOD_TYPE_DARK_OAK,
-				ConventionalBiomeTags.PRIMARY_WOOD_TYPE_MANGROVE,
-				ConventionalBiomeTags.PRIMARY_WOOD_TYPE_CHERRY,
-				ConventionalBiomeTags.PRIMARY_WOOD_TYPE_PALE_OAK,
-				ConventionalBiomeTags.PRIMARY_WOOD_TYPE_BAMBOO,
-				ConventionalBiomeTags.PRIMARY_WOOD_TYPE_CRIMSON,
-				ConventionalBiomeTags.PRIMARY_WOOD_TYPE_WARPED);
+		builder(ConventionalBiomeTags.PRIMARY_WOOD_TYPE)
+				.addTag(ConventionalBiomeTags.PRIMARY_WOOD_TYPE_OAK)
+				.addTag(ConventionalBiomeTags.PRIMARY_WOOD_TYPE_BIRCH)
+				.addTag(ConventionalBiomeTags.PRIMARY_WOOD_TYPE_SPRUCE)
+				.addTag(ConventionalBiomeTags.PRIMARY_WOOD_TYPE_JUNGLE)
+				.addTag(ConventionalBiomeTags.PRIMARY_WOOD_TYPE_ACACIA)
+				.addTag(ConventionalBiomeTags.PRIMARY_WOOD_TYPE_DARK_OAK)
+				.addTag(ConventionalBiomeTags.PRIMARY_WOOD_TYPE_MANGROVE)
+				.addTag(ConventionalBiomeTags.PRIMARY_WOOD_TYPE_CHERRY)
+				.addTag(ConventionalBiomeTags.PRIMARY_WOOD_TYPE_PALE_OAK)
+				.addTag(ConventionalBiomeTags.PRIMARY_WOOD_TYPE_BAMBOO)
+				.addTag(ConventionalBiomeTags.PRIMARY_WOOD_TYPE_CRIMSON)
+				.addTag(ConventionalBiomeTags.PRIMARY_WOOD_TYPE_WARPED);
 
 		builder(ConventionalBiomeTags.IS_CONIFEROUS_TREE)
 				.addOptionalTag(ConventionalBiomeTags.IS_TAIGA)
