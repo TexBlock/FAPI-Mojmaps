@@ -49,7 +49,7 @@ public abstract class ChunkRendererRegionBuilderMixin {
 	@Unique
 	private static final Logger LOGGER = LoggerFactory.getLogger(ChunkRendererRegionBuilderMixin.class);
 
-	@Inject(method = "build", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/render/chunk/ChunkRendererRegionBuilder;method_72042(Lnet/minecraft/world/World;III)Lnet/minecraft/client/render/chunk/RenderedChunk;"))
+	@Inject(method = "build", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/render/chunk/ChunkRendererRegionBuilder;getRenderedChunk(Lnet/minecraft/world/World;III)Lnet/minecraft/client/render/chunk/RenderedChunk;"))
 	private void copyDataForChunk(World world, long packedChunkPos, CallbackInfoReturnable<ChunkRendererRegion> cir, @Share("dataMap") LocalRef<Long2ObjectOpenHashMap<Object>> mapRef, @Local(ordinal = 11) int x, @Local(ordinal = 10) int y, @Local(ordinal = 9) int z) {
 		// Hash maps in chunks should generally not be modified outside of client thread
 		// but does happen in practice, due to mods or inconsistent vanilla behaviors, causing
