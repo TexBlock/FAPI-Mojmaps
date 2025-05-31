@@ -16,12 +16,17 @@
 
 package net.fabricmc.fabric.api.loot.v3;
 
+import java.util.List;
+
 import org.jetbrains.annotations.Nullable;
 
+import net.minecraft.item.ItemStack;
 import net.minecraft.loot.LootTable;
+import net.minecraft.loot.context.LootContext;
 import net.minecraft.registry.Registry;
 import net.minecraft.registry.RegistryKey;
 import net.minecraft.registry.RegistryWrapper;
+import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.resource.ResourceManager;
 
 import net.fabricmc.fabric.api.event.Event;
@@ -96,6 +101,17 @@ public final class LootTableEvents {
 		}
 	});
 
+	/**
+	 * This event can be used for cases where the {@link #MODIFY} and {@link #REPLACE} events are inconvenient, such as when you are modifying the result of many loot tables that are unknown,
+	 * and don't wish to add a custom loot function to every table.
+	 * <br/>Note: if the table was requested to separate drops into stacks of a given size, the resulting drops from this event will be separated.
+	 */
+	public static final Event<ModifyDrops> MODIFY_DROPS = EventFactory.createArrayBacked(ModifyDrops.class, listeners -> (key, context, drops) -> {
+		for (ModifyDrops listener : listeners) {
+			listener.modifyLootTableDrops(key, context, drops);
+		}
+	});
+
 	@FunctionalInterface
 	public interface Replace {
 		/**
@@ -133,5 +149,16 @@ public final class LootTableEvents {
 		 * @param lootRegistry     the loot registry
 		 */
 		void onLootTablesLoaded(ResourceManager resourceManager, Registry<LootTable> lootRegistry);
+	}
+
+	@FunctionalInterface
+	public interface ModifyDrops {
+		/**
+		 * Called after a loot table is finished generating drops to modify drops.
+		 * @param entry the loot table's registry entry
+		 * @param context the loot context for the current drops
+		 * @param drops the list of drops from the loot table to modify
+		 */
+		void modifyLootTableDrops(RegistryEntry.Reference<LootTable> entry, LootContext context, List<ItemStack> drops);
 	}
 }
