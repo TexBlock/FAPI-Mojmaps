@@ -67,7 +67,7 @@ public class SpecialBlockRendererTest implements ClientModInitializer {
 					}
 
 					@Override
-					public void method_72175(Set<Vector3f> set) {
+					public void collectVertices(Set<Vector3f> set) {
 					}
 
 					@Override

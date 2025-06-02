@@ -48,7 +48,7 @@ public class TestServerConnectionImpl implements TestServerConnection {
 			}
 
 			client.world.disconnect(Text.literal("Disconnecting"));
-			client.method_72099();
+			client.disconnectWithSavingScreen();
 		});
 
 		context.waitFor(client -> client.world == null);
