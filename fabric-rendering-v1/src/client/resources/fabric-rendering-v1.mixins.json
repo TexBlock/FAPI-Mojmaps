@@ -12,6 +12,7 @@
     "ClientWorldMixin",
     "DebugHudMixin",
     "DimensionEffectsAccessor",
+    "DrawContextMixin",
     "EntityModelLayersAccessor",
     "EntityModelsMixin",
     "EntityRenderersMixin",
