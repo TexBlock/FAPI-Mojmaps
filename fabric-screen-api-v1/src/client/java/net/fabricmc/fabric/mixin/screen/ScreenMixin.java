@@ -94,6 +94,12 @@ abstract class ScreenMixin implements ScreenExtensions {
 	@Unique
 	private Event<ScreenMouseEvents.AfterMouseRelease> afterMouseReleaseEvent;
 	@Unique
+	private Event<ScreenMouseEvents.AllowMouseDrag> allowMouseDragEvent;
+	@Unique
+	private Event<ScreenMouseEvents.BeforeMouseDrag> beforeMouseDragEvent;
+	@Unique
+	private Event<ScreenMouseEvents.AfterMouseDrag> afterMouseDragEvent;
+	@Unique
 	private Event<ScreenMouseEvents.AllowMouseScroll> allowMouseScrollEvent;
 	@Unique
 	private Event<ScreenMouseEvents.BeforeMouseScroll> beforeMouseScrollEvent;
@@ -145,6 +151,9 @@ abstract class ScreenMixin implements ScreenExtensions {
 		this.allowMouseReleaseEvent = ScreenEventFactory.createAllowMouseReleaseEvent();
 		this.beforeMouseReleaseEvent = ScreenEventFactory.createBeforeMouseReleaseEvent();
 		this.afterMouseReleaseEvent = ScreenEventFactory.createAfterMouseReleaseEvent();
+		this.allowMouseDragEvent = ScreenEventFactory.createAllowMouseDragEvent();
+		this.beforeMouseDragEvent = ScreenEventFactory.createBeforeMouseDragEvent();
+		this.afterMouseDragEvent = ScreenEventFactory.createAfterMouseDragEvent();
 		this.allowMouseScrollEvent = ScreenEventFactory.createAllowMouseScrollEvent();
 		this.beforeMouseScrollEvent = ScreenEventFactory.createBeforeMouseScrollEvent();
 		this.afterMouseScrollEvent = ScreenEventFactory.createAfterMouseScrollEvent();
@@ -263,6 +272,21 @@ abstract class ScreenMixin implements ScreenExtensions {
 	@Override
 	public Event<ScreenMouseEvents.AfterMouseRelease> fabric_getAfterMouseReleaseEvent() {
 		return ensureEventsAreInitialized(this.afterMouseReleaseEvent);
+	}
+
+	@Override
+	public Event<ScreenMouseEvents.AllowMouseDrag> fabric_getAllowMouseDragEvent() {
+		return ensureEventsAreInitialized(this.allowMouseDragEvent);
+	}
+
+	@Override
+	public Event<ScreenMouseEvents.BeforeMouseDrag> fabric_getBeforeMouseDragEvent() {
+		return ensureEventsAreInitialized(this.beforeMouseDragEvent);
+	}
+
+	@Override
+	public Event<ScreenMouseEvents.AfterMouseDrag> fabric_getAfterMouseDragEvent() {
+		return ensureEventsAreInitialized(this.afterMouseDragEvent);
 	}
 
 	@Override
