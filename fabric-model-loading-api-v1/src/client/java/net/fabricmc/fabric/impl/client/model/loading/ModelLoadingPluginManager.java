@@ -24,12 +24,10 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
 
 import org.jetbrains.annotations.UnmodifiableView;
-
-import net.minecraft.resource.ResourceManager;
-import net.minecraft.util.Util;
-
 import net.fabricmc.fabric.api.client.model.loading.v1.ModelLoadingPlugin;
 import net.fabricmc.fabric.api.client.model.loading.v1.PreparableModelLoadingPlugin;
+import net.minecraft.Util;
+import net.minecraft.server.packs.resources.ResourceManager;
 
 public final class ModelLoadingPluginManager {
 	private static final List<ModelLoadingPlugin> PLUGINS = new ArrayList<>();
@@ -64,7 +62,7 @@ public final class ModelLoadingPluginManager {
 			futures.add(preparePlugin(holder, resourceManager, executor));
 		}
 
-		return Util.combineSafe(futures);
+		return Util.sequence(futures);
 	}
 
 	private static <T> CompletableFuture<ModelLoadingPlugin> preparePlugin(HolderImpl<T> holder, ResourceManager resourceManager, Executor executor) {

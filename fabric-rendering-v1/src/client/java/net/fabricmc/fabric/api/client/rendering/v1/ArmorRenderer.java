@@ -16,29 +16,28 @@
 
 package net.fabricmc.fabric.api.client.rendering.v1;
 
+import net.minecraft.client.model.HumanoidModel;
 import net.minecraft.client.model.Model;
-import net.minecraft.client.render.OverlayTexture;
-import net.minecraft.client.render.RenderLayer;
-import net.minecraft.client.render.VertexConsumer;
-import net.minecraft.client.render.VertexConsumerProvider;
-import net.minecraft.client.render.entity.feature.FeatureRenderer;
-import net.minecraft.client.render.entity.model.BipedEntityModel;
-import net.minecraft.client.render.entity.state.BipedEntityRenderState;
-import net.minecraft.client.render.item.ItemRenderer;
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.entity.EquipmentSlot;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.item.ItemConvertible;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.Identifier;
-
+import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.entity.ItemRenderer;
+import net.minecraft.client.renderer.entity.layers.RenderLayer;
+import net.minecraft.client.renderer.entity.state.HumanoidRenderState;
+import net.minecraft.client.renderer.texture.OverlayTexture;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.ItemLike;
+import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.fabricmc.fabric.impl.client.rendering.ArmorRendererRegistryImpl;
 
 /**
  * Armor renderers render worn armor items with custom code.
  * They may be used to render armor with special models or effects.
  *
- * <p>The renderers are registered with {@link net.fabricmc.fabric.api.client.rendering.v1.ArmorRenderer#register(ArmorRenderer, ItemConvertible...)}.
+ * <p>The renderers are registered with {@link net.fabricmc.fabric.api.client.rendering.v1.ArmorRenderer#register(ArmorRenderer, ItemLike...)}.
  */
 @FunctionalInterface
 public interface ArmorRenderer {
@@ -49,14 +48,14 @@ public interface ArmorRenderer {
 	 * @throws IllegalArgumentException if an item already has a registered armor renderer
 	 * @throws NullPointerException if either an item or the renderer is null
 	 */
-	static void register(ArmorRenderer renderer, ItemConvertible... items) {
+	static void register(ArmorRenderer renderer, ItemLike... items) {
 		ArmorRendererRegistryImpl.register(renderer, items);
 	}
 
 	/**
 	 * Helper method for rendering a specific armor model, comes after setting visibility.
 	 *
-	 * <p>This primarily handles applying glint and the correct {@link RenderLayer}
+	 * <p>This primarily handles applying glint and the correct {@link RenderType}
 	 * @param matrices			the matrix stack
 	 * @param vertexConsumers	the vertex consumer provider
 	 * @param light				packed lightmap coordinates
@@ -64,9 +63,9 @@ public interface ArmorRenderer {
 	 * @param model				the model to be rendered
 	 * @param texture			the texture to be applied
 	 */
-	static void renderPart(MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, ItemStack stack, Model model, Identifier texture) {
-		VertexConsumer vertexConsumer = ItemRenderer.getArmorGlintConsumer(vertexConsumers, RenderLayer.getArmorCutoutNoCull(texture), stack.hasGlint());
-		model.render(matrices, vertexConsumer, light, OverlayTexture.DEFAULT_UV, 0xFFFFFFFF);
+	static void renderPart(PoseStack matrices, MultiBufferSource vertexConsumers, int light, ItemStack stack, Model model, ResourceLocation texture) {
+		VertexConsumer vertexConsumer = ItemRenderer.getArmorFoilBuffer(vertexConsumers, RenderType.armorCutoutNoCull(texture), stack.hasFoil());
+		model.renderToBuffer(matrices, vertexConsumer, light, OverlayTexture.NO_OVERLAY, 0xFFFFFFFF);
 	}
 
 	/**
@@ -78,9 +77,9 @@ public interface ArmorRenderer {
 	 * @param bipedEntityRenderState the render state of the entity
 	 * @param slot				     the equipment slot in which the armor stack is worn
 	 * @param light				     packed lightmap coordinates
-	 * @param contextModel		     the model provided by {@link FeatureRenderer#getContextModel()}
+	 * @param contextModel		     the model provided by {@link RenderLayer#getParentModel()}
 	 */
-	void render(MatrixStack matrices, VertexConsumerProvider vertexConsumers, ItemStack stack, BipedEntityRenderState bipedEntityRenderState, EquipmentSlot slot, int light, BipedEntityModel<BipedEntityRenderState> contextModel);
+	void render(PoseStack matrices, MultiBufferSource vertexConsumers, ItemStack stack, HumanoidRenderState bipedEntityRenderState, EquipmentSlot slot, int light, HumanoidModel<HumanoidRenderState> contextModel);
 
 	/**
 	 * Checks whether an item stack equipped on the head should also be
@@ -90,9 +89,9 @@ public interface ArmorRenderer {
 	 * <p>This method only applies to items registered with this renderer.
 	 *
 	 * <p>Note that the item will never be rendered by vanilla code if it has an armor model defined
-	 * by the {@link net.minecraft.component.DataComponentTypes#EQUIPPABLE minecraft:equippable} component.
+	 * by the {@link net.minecraft.core.component.DataComponents#EQUIPPABLE minecraft:equippable} component.
 	 * This method cannot be used to overwrite that check to re-enable also rendering the item model.
-	 * See {@link net.minecraft.client.render.entity.feature.ArmorFeatureRenderer#hasModel(ItemStack, EquipmentSlot)}.
+	 * See {@link net.minecraft.client.renderer.entity.layers.HumanoidArmorLayer#shouldRender(ItemStack, EquipmentSlot)}.
 	 *
 	 * @param entity the equipping entity
 	 * @param stack  the item stack equipped on the head

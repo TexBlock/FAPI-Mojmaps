@@ -27,19 +27,17 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
-
-import net.minecraft.block.Block;
-import net.minecraft.client.data.ModelProvider;
-import net.minecraft.client.item.ItemAsset;
-import net.minecraft.item.BlockItem;
-import net.minecraft.item.Item;
-import net.minecraft.registry.Registries;
-import net.minecraft.registry.entry.RegistryEntry;
-
 import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput;
 import net.fabricmc.fabric.impl.datagen.client.FabricItemAssetDefinitions;
+import net.minecraft.client.data.models.ModelProvider;
+import net.minecraft.client.renderer.item.ClientItem;
+import net.minecraft.core.Holder;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.world.item.BlockItem;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.level.block.Block;
 
-@Mixin(ModelProvider.ItemAssets.class)
+@Mixin(ModelProvider.ItemInfoCollector.class)
 public class ModelProviderItemAssetsMixin implements FabricItemAssetDefinitions {
 	@Unique
 	private FabricDataOutput fabricDataOutput;
@@ -56,8 +54,8 @@ public class ModelProviderItemAssetsMixin implements FabricItemAssetDefinitions 
 		this.fabricDataOutput = fabricDataOutput;
 	}
 
-	@WrapOperation(method = "method_65470", at = @At(value = "INVOKE", target = "Ljava/util/Map;containsKey(Ljava/lang/Object;)Z", ordinal = 1, remap = false))
-	private boolean filterItemsForProcessingMod(Map<Item, ItemAsset> map, Object o, Operation<Boolean> original) {
+	@WrapOperation(method = "lambda$finalizeAndValidate$0", at = @At(value = "INVOKE", target = "Ljava/util/Map;containsKey(Ljava/lang/Object;)Z", ordinal = 1, remap = false))
+	private boolean filterItemsForProcessingMod(Map<Item, ClientItem> map, Object o, Operation<Boolean> original) {
 		BlockItem blockItem = (BlockItem) o;
 
 		if (fabricDataOutput != null) {
@@ -66,7 +64,7 @@ public class ModelProviderItemAssetsMixin implements FabricItemAssetDefinitions 
 				return true;
 			}
 
-			if (!Registries.ITEM.getId(blockItem).getNamespace().equals(fabricDataOutput.getModId())) {
+			if (!BuiltInRegistries.ITEM.getKey(blockItem).getNamespace().equals(fabricDataOutput.getModId())) {
 				// Skip over items that are not from the mod we are processing.
 				return true;
 			}
@@ -75,15 +73,15 @@ public class ModelProviderItemAssetsMixin implements FabricItemAssetDefinitions 
 		return original.call(map, o);
 	}
 
-	@Redirect(method = "resolveAndValidate", at = @At(value = "INVOKE", target = "Ljava/util/stream/Stream;filter(Ljava/util/function/Predicate;)Ljava/util/stream/Stream;", ordinal = 0, remap = false))
-	private Stream<RegistryEntry.Reference<Item>> filterItemsForProcessingMod(Stream<RegistryEntry.Reference<Item>> instance, Predicate<RegistryEntry.Reference<Item>> predicate) {
+	@Redirect(method = "finalizeAndValidate", at = @At(value = "INVOKE", target = "Ljava/util/stream/Stream;filter(Ljava/util/function/Predicate;)Ljava/util/stream/Stream;", ordinal = 0, remap = false))
+	private Stream<Holder.Reference<Item>> filterItemsForProcessingMod(Stream<Holder.Reference<Item>> instance, Predicate<Holder.Reference<Item>> predicate) {
 		return instance.filter((item) -> {
 			if (fabricDataOutput != null) {
 				if (!fabricDataOutput.isStrictValidationEnabled()) {
 					return false;
 				}
 
-				if (!item.registryKey().getValue().getNamespace().equals(fabricDataOutput.getModId())) {
+				if (!item.key().location().getNamespace().equals(fabricDataOutput.getModId())) {
 					// Skip over items that are not from the mod we are processing.
 					return false;
 				}

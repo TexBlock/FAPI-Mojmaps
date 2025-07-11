@@ -21,24 +21,22 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
-
-import net.minecraft.client.util.InputUtil;
-
+import com.mojang.blaze3d.platform.InputConstants;
 import net.fabricmc.fabric.impl.client.gametest.TestInputImpl;
 
-@Mixin(InputUtil.class)
+@Mixin(InputConstants.class)
 public class InputUtilMixin {
-	@Inject(method = "isKeyPressed", at = @At("HEAD"), cancellable = true)
+	@Inject(method = "isKeyDown", at = @At("HEAD"), cancellable = true)
 	private static void useGameTestInputForKeyPressed(long window, int keyCode, CallbackInfoReturnable<Boolean> cir) {
 		cir.setReturnValue(TestInputImpl.isKeyDown(keyCode));
 	}
 
-	@Inject(method = {"setKeyboardCallbacks", "setMouseCallbacks"}, at = @At("HEAD"), cancellable = true)
+	@Inject(method = {"setupKeyboardCallbacks", "setupMouseCallbacks"}, at = @At("HEAD"), cancellable = true)
 	private static void dontAttachCallbacks(CallbackInfo ci) {
 		ci.cancel();
 	}
 
-	@Inject(method = "setCursorParameters", at = @At("HEAD"), cancellable = true)
+	@Inject(method = "grabOrReleaseMouse", at = @At("HEAD"), cancellable = true)
 	private static void disableCursorLocking(CallbackInfo ci) {
 		ci.cancel();
 	}

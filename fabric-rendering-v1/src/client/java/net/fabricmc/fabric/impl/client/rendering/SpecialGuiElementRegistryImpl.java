@@ -19,13 +19,11 @@ package net.fabricmc.fabric.impl.client.rendering;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.render.SpecialGuiElementRenderer;
-import net.minecraft.client.gui.render.state.special.SpecialGuiElementRenderState;
-import net.minecraft.client.render.VertexConsumerProvider;
-
 import net.fabricmc.fabric.api.client.rendering.v1.SpecialGuiElementRegistry;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.render.pip.PictureInPictureRenderer;
+import net.minecraft.client.gui.render.state.pip.PictureInPictureRenderState;
+import net.minecraft.client.renderer.MultiBufferSource;
 
 public final class SpecialGuiElementRegistryImpl {
 	private static RegistrationHandler registrationHandler = new EarlyRegistrationHandler();
@@ -38,8 +36,8 @@ public final class SpecialGuiElementRegistryImpl {
 	}
 
 	// Called after the vanilla special renderers are created.
-	public static void onReady(MinecraftClient client, VertexConsumerProvider.Immediate immediate,
-								Map<Class<? extends SpecialGuiElementRenderState>, SpecialGuiElementRenderer<?>> specialElementRenderers) {
+	public static void onReady(Minecraft client, MultiBufferSource.BufferSource immediate,
+								Map<Class<? extends PictureInPictureRenderState>, PictureInPictureRenderer<?>> specialElementRenderers) {
 		switch (registrationHandler) {
 		case EarlyRegistrationHandler handler -> registrationHandler = handler.onCreated(client, immediate, specialElementRenderers);
 		case LateRegistrationHandler handler -> throw new IllegalStateException("Already transitioned to late registration handler");
@@ -50,9 +48,9 @@ public final class SpecialGuiElementRegistryImpl {
 		void register(SpecialGuiElementRegistry.Factory factory);
 
 		default void applyFactory(SpecialGuiElementRegistry.Factory factory, SpecialGuiElementRegistry.Context context,
-									Map<Class<? extends SpecialGuiElementRenderState>, SpecialGuiElementRenderer<?>> specialElementRenderers) {
-			SpecialGuiElementRenderer<?> elementRenderer = factory.createSpecialRenderer(context);
-			specialElementRenderers.put(elementRenderer.getElementClass(), elementRenderer);
+									Map<Class<? extends PictureInPictureRenderState>, PictureInPictureRenderer<?>> specialElementRenderers) {
+			PictureInPictureRenderer<?> elementRenderer = factory.createSpecialRenderer(context);
+			specialElementRenderers.put(elementRenderer.getRenderStateClass(), elementRenderer);
 		}
 	}
 
@@ -66,8 +64,8 @@ public final class SpecialGuiElementRegistryImpl {
 		}
 
 		// Transition to late registration handler after the vanilla special renderers are created.
-		public LateRegistrationHandler onCreated(MinecraftClient client, VertexConsumerProvider.Immediate immediate,
-												Map<Class<? extends SpecialGuiElementRenderState>, SpecialGuiElementRenderer<?>> specialElementRenderers) {
+		public LateRegistrationHandler onCreated(Minecraft client, MultiBufferSource.BufferSource immediate,
+												Map<Class<? extends PictureInPictureRenderState>, PictureInPictureRenderer<?>> specialElementRenderers) {
 			var context = new ContextImpl(client, immediate);
 
 			for (SpecialGuiElementRegistry.Factory factory : pendingFactories) {
@@ -80,12 +78,12 @@ public final class SpecialGuiElementRegistryImpl {
 
 	// Handle calls to register after the vanilla special renderers are created.
 	private record LateRegistrationHandler(SpecialGuiElementRegistry.Context context,
-														Map<Class<? extends SpecialGuiElementRenderState>, SpecialGuiElementRenderer<?>> specialElementRenderers) implements RegistrationHandler {
+														Map<Class<? extends PictureInPictureRenderState>, PictureInPictureRenderer<?>> specialElementRenderers) implements RegistrationHandler {
 		@Override
 		public void register(SpecialGuiElementRegistry.Factory factory) {
 			applyFactory(factory, context, specialElementRenderers);
 		}
 	}
 
-	record ContextImpl(MinecraftClient client, VertexConsumerProvider.Immediate vertexConsumers) implements SpecialGuiElementRegistry.Context { }
+	record ContextImpl(Minecraft client, MultiBufferSource.BufferSource vertexConsumers) implements SpecialGuiElementRegistry.Context { }
 }

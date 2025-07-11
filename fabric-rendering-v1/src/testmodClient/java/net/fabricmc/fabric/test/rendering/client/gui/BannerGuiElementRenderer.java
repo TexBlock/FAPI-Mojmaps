@@ -16,36 +16,36 @@
 
 package net.fabricmc.fabric.test.rendering.client.gui;
 
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.render.SpecialGuiElementRenderer;
-import net.minecraft.client.render.DiffuseLighting;
-import net.minecraft.client.render.OverlayTexture;
-import net.minecraft.client.render.VertexConsumerProvider;
-import net.minecraft.client.render.block.entity.BannerBlockEntityRenderer;
-import net.minecraft.client.render.entity.model.EntityModelLayers;
-import net.minecraft.client.render.model.ModelBaker;
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.component.type.BannerPatternsComponent;
-import net.minecraft.util.DyeColor;
+import com.mojang.blaze3d.platform.Lighting;
+import com.mojang.blaze3d.vertex.PoseStack;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.render.pip.PictureInPictureRenderer;
+import net.minecraft.client.model.geom.ModelLayers;
+import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.blockentity.BannerRenderer;
+import net.minecraft.client.renderer.texture.OverlayTexture;
+import net.minecraft.client.resources.model.ModelBakery;
+import net.minecraft.world.item.DyeColor;
+import net.minecraft.world.level.block.entity.BannerPatternLayers;
 
-public class BannerGuiElementRenderer extends SpecialGuiElementRenderer<BannerGuiElementRenderState> {
-	protected BannerGuiElementRenderer(VertexConsumerProvider.Immediate vertexConsumers) {
+public class BannerGuiElementRenderer extends PictureInPictureRenderer<BannerGuiElementRenderState> {
+	protected BannerGuiElementRenderer(MultiBufferSource.BufferSource vertexConsumers) {
 		super(vertexConsumers);
 	}
 
 	@Override
-	public Class<BannerGuiElementRenderState> getElementClass() {
+	public Class<BannerGuiElementRenderState> getRenderStateClass() {
 		return BannerGuiElementRenderState.class;
 	}
 
 	@Override
-	protected void render(BannerGuiElementRenderState state, MatrixStack matrices) {
-		MinecraftClient.getInstance().gameRenderer.getDiffuseLighting().setShaderLights(DiffuseLighting.Type.ITEMS_FLAT);
-		BannerBlockEntityRenderer.renderCanvas(matrices, vertexConsumers, 15728880, OverlayTexture.DEFAULT_UV, MinecraftClient.getInstance().getLoadedEntityModels().getModelPart(EntityModelLayers.STANDING_BANNER_FLAG).getChild("flag"), ModelBaker.BANNER_BASE, true, DyeColor.BLUE, BannerPatternsComponent.DEFAULT);
+	protected void renderToTexture(BannerGuiElementRenderState state, PoseStack matrices) {
+		Minecraft.getInstance().gameRenderer.getLighting().setupFor(Lighting.Entry.ITEMS_FLAT);
+		BannerRenderer.renderPatterns(matrices, bufferSource, 15728880, OverlayTexture.NO_OVERLAY, Minecraft.getInstance().getEntityModels().bakeLayer(ModelLayers.STANDING_BANNER_FLAG).getChild("flag"), ModelBakery.BANNER_BASE, true, DyeColor.BLUE, BannerPatternLayers.EMPTY);
 	}
 
 	@Override
-	protected String getName() {
+	protected String getTextureLabel() {
 		return "fabric test banner";
 	}
 }

@@ -16,20 +16,16 @@
 
 package net.fabricmc.fabric.test.attachment.client;
 
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.network.ClientPlayerEntity;
-import net.minecraft.client.option.SimpleOption;
-import net.minecraft.text.Text;
-
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientEntityEvents;
 import net.fabricmc.fabric.test.attachment.AttachmentTestMod;
+import net.minecraft.client.player.LocalPlayer;
 
 public class AttachmentClientTestMod implements ClientModInitializer {
 	@Override
 	public void onInitializeClient() {
 		ClientEntityEvents.ENTITY_LOAD.register((entity, world) -> {
-			if (entity instanceof ClientPlayerEntity) {
+			if (entity instanceof LocalPlayer) {
 				entity.onAttachedSet(AttachmentTestMod.SYNCED_RENDER_DISTANCE).register((oldValue, newValue) -> {
 					SimpleOption<Integer> viewDistance = MinecraftClient.getInstance().options.getViewDistance();
 

@@ -16,28 +16,27 @@
 
 package net.fabricmc.fabric.test.rendering.client;
 
-import net.minecraft.registry.tag.ItemTags;
-import net.minecraft.util.Formatting;
-import net.minecraft.util.math.ColorHelper;
-
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.rendering.v1.DrawItemStackOverlayCallback;
+import net.minecraft.ChatFormatting;
+import net.minecraft.tags.ItemTags;
+import net.minecraft.util.ARGB;
 
 public class ItemStackOverlayTest implements ClientModInitializer {
 	@Override
 	public void onInitializeClient() {
 		DrawItemStackOverlayCallback.EVENT.register((context, textRenderer, stack, x, y) -> {
 			// renders a plus sign on all shulker boxes where the stack count would usually be
-			if (stack.isIn(ItemTags.SHULKER_BOXES)) {
+			if (stack.is(ItemTags.SHULKER_BOXES)) {
 				String s = "+";
-				context.getMatrices().pushMatrix();
-				context.drawText(textRenderer,
+				context.pose().pushMatrix();
+				context.drawString(textRenderer,
 						s,
-						x + 19 - 2 - textRenderer.getWidth(s),
+						x + 19 - 2 - textRenderer.width(s),
 						y + 6 + 3,
-						ColorHelper.fullAlpha(Formatting.YELLOW.getColorValue()),
+						ARGB.opaque(ChatFormatting.YELLOW.getColor()),
 						true);
-				context.getMatrices().popMatrix();
+				context.pose().popMatrix();
 			}
 		});
 	}

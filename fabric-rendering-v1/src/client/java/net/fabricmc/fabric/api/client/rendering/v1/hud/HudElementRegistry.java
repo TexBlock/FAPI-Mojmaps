@@ -18,17 +18,15 @@ package net.fabricmc.fabric.api.client.rendering.v1.hud;
 
 import java.util.Objects;
 import java.util.function.Function;
-
-import net.minecraft.util.Identifier;
-
 import net.fabricmc.fabric.impl.client.rendering.hud.HudElementRegistryImpl;
+import net.minecraft.resources.ResourceLocation;
 
 /**
  * A registry of identified hud layers with methods to add layers in specific positions.
  *
  * <p>Operations relative to a vanilla element will inherit that element's render condition.
- * The render condition for all vanilla layers except {@link VanillaHudElements#SLEEP} is {@link net.minecraft.client.option.GameOptions#hudHidden}.
- * Only {@link #addFirst(Identifier, HudElement)} and {@link #addLast(Identifier, HudElement)} will not inherit any render condition.
+ * The render condition for all vanilla layers except {@link VanillaHudElements#SLEEP} is {@link net.minecraft.client.Options#hideGui}.
+ * Only {@link #addFirst(ResourceLocation, HudElement)} and {@link #addLast(ResourceLocation, HudElement)} will not inherit any render condition.
  * There is currently no mechanism to change the render condition of a vanilla element.
  * For vanilla layers, see {@link VanillaHudElements}.
  *
@@ -56,7 +54,7 @@ import net.fabricmc.fabric.impl.client.rendering.hud.HudElementRegistryImpl;
  *     </tr>
  *     <tr>
  *         <td>Before {@link VanillaHudElements#CHAT CHAT}</td>
- *         <td>Render after the debug HUD, scoreboard, overlay message (action bar), and title and subtitle and before {@link net.minecraft.client.gui.hud.ChatHud ChatHud}, player list, and sound subtitles</td>
+ *         <td>Render after the debug HUD, scoreboard, overlay message (action bar), and title and subtitle and before {@link net.minecraft.client.gui.components.ChatComponent ChatHud}, player list, and sound subtitles</td>
  *     </tr>
  *     <tr>
  *         <td>After {@link VanillaHudElements#SUBTITLES SUBTITLES}</td>
@@ -70,7 +68,7 @@ public interface HudElementRegistry {
 	 *
 	 * @param element the element to add
 	 */
-	static void addFirst(Identifier id, HudElement element) {
+	static void addFirst(ResourceLocation id, HudElement element) {
 		Objects.requireNonNull(id, "identifier");
 		Objects.requireNonNull(element, "hudElement");
 		HudElementRegistryImpl.addFirst(id, element);
@@ -81,7 +79,7 @@ public interface HudElementRegistry {
 	 *
 	 * @param element the element to add
 	 */
-	static void addLast(Identifier id, HudElement element) {
+	static void addLast(ResourceLocation id, HudElement element) {
 		Objects.requireNonNull(id, "identifier");
 		Objects.requireNonNull(element, "hudElement");
 		HudElementRegistryImpl.addLast(id, element);
@@ -96,7 +94,7 @@ public interface HudElementRegistry {
 	 * @param identifier the identifier of the new element
 	 * @param element    the element to add
 	 */
-	static void attachElementBefore(Identifier beforeThis, Identifier identifier, HudElement element) {
+	static void attachElementBefore(ResourceLocation beforeThis, ResourceLocation identifier, HudElement element) {
 		Objects.requireNonNull(beforeThis, "beforeThis");
 		Objects.requireNonNull(identifier, "identifier");
 		Objects.requireNonNull(element, "hudElement");
@@ -112,7 +110,7 @@ public interface HudElementRegistry {
 	 * @param identifier the identifier of the new element
 	 * @param element    the element to add
 	 */
-	static void attachElementAfter(Identifier afterThis, Identifier identifier, HudElement element) {
+	static void attachElementAfter(ResourceLocation afterThis, ResourceLocation identifier, HudElement element) {
 		Objects.requireNonNull(afterThis, "afterThis");
 		Objects.requireNonNull(identifier, "identifier");
 		Objects.requireNonNull(element, "hudElement");
@@ -124,7 +122,7 @@ public interface HudElementRegistry {
 	 *
 	 * @param identifier the identifier of the element to remove
 	 */
-	static void removeElement(Identifier identifier) {
+	static void removeElement(ResourceLocation identifier) {
 		Objects.requireNonNull(identifier, "identifier");
 		HudElementRegistryImpl.removeElement(identifier);
 	}
@@ -137,7 +135,7 @@ public interface HudElementRegistry {
 	 * @param identifier the identifier of the element to replace
 	 * @param replacer   a function that takes the old element and returns the new element
 	 */
-	static void replaceElement(Identifier identifier, Function<HudElement, HudElement> replacer) {
+	static void replaceElement(ResourceLocation identifier, Function<HudElement, HudElement> replacer) {
 		Objects.requireNonNull(identifier, "identifier");
 		Objects.requireNonNull(replacer, "replacer");
 		HudElementRegistryImpl.replaceElement(identifier, replacer);

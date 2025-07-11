@@ -34,55 +34,53 @@ import com.mojang.serialization.JsonOps;
 import com.mojang.serialization.Lifecycle;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import net.minecraft.registry.CombinedDynamicRegistries;
-import net.minecraft.registry.DynamicRegistryManager;
-import net.minecraft.registry.Registry;
-import net.minecraft.registry.RegistryKey;
-import net.minecraft.registry.RegistryWrapper;
-import net.minecraft.registry.tag.TagKey;
-import net.minecraft.resource.Resource;
-import net.minecraft.resource.ResourceFinder;
-import net.minecraft.resource.ResourceManager;
-import net.minecraft.resource.SinglePreparationResourceReloader;
-import net.minecraft.util.Identifier;
+import net.minecraft.core.HolderLookup;
+import net.minecraft.core.LayeredRegistryAccess;
+import net.minecraft.core.Registry;
+import net.minecraft.core.RegistryAccess;
+import net.minecraft.resources.FileToIdConverter;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.packs.resources.Resource;
+import net.minecraft.server.packs.resources.ResourceManager;
+import net.minecraft.server.packs.resources.SimplePreparableReloadListener;
+import net.minecraft.tags.TagKey;
 import net.minecraft.util.StrictJsonParser;
-import net.minecraft.util.profiler.Profiler;
-
+import net.minecraft.util.profiling.ProfilerFiller;
 import net.fabricmc.fabric.api.resource.IdentifiableResourceReloadListener;
 
-public final class TagAliasLoader extends SinglePreparationResourceReloader<Map<RegistryKey<? extends Registry<?>>, List<TagAliasLoader.Data>>> implements IdentifiableResourceReloadListener {
-	public static final Identifier ID = Identifier.of("fabric-tag-api-v1", "tag_alias_groups");
+public final class TagAliasLoader extends SimplePreparableReloadListener<Map<ResourceKey<? extends Registry<?>>, List<TagAliasLoader.Data>>> implements IdentifiableResourceReloadListener {
+	public static final ResourceLocation ID = ResourceLocation.fromNamespaceAndPath("fabric-tag-api-v1", "tag_alias_groups");
 
 	private static final Logger LOGGER = LoggerFactory.getLogger("fabric-tag-api-v1");
-	private final RegistryWrapper.WrapperLookup registries;
+	private final HolderLookup.Provider registries;
 
-	public TagAliasLoader(RegistryWrapper.WrapperLookup registries) {
+	public TagAliasLoader(HolderLookup.Provider registries) {
 		this.registries = registries;
 	}
 
 	@Override
-	public Identifier getFabricId() {
+	public ResourceLocation getFabricId() {
 		return ID;
 	}
 
 	@SuppressWarnings("unchecked")
 	@Override
-	protected Map<RegistryKey<? extends Registry<?>>, List<TagAliasLoader.Data>> prepare(ResourceManager manager, Profiler profiler) {
-		Map<RegistryKey<? extends Registry<?>>, List<TagAliasLoader.Data>> dataByRegistry = new HashMap<>();
-		Iterator<RegistryKey<? extends Registry<?>>> registryIterator = registries.streamAllRegistryKeys().iterator();
+	protected Map<ResourceKey<? extends Registry<?>>, List<TagAliasLoader.Data>> prepare(ResourceManager manager, ProfilerFiller profiler) {
+		Map<ResourceKey<? extends Registry<?>>, List<TagAliasLoader.Data>> dataByRegistry = new HashMap<>();
+		Iterator<ResourceKey<? extends Registry<?>>> registryIterator = registries.listRegistryKeys().iterator();
 
 		while (registryIterator.hasNext()) {
-			RegistryKey<? extends Registry<?>> registryKey = registryIterator.next();
-			ResourceFinder resourceFinder = ResourceFinder.json(getDirectory(registryKey));
+			ResourceKey<? extends Registry<?>> registryKey = registryIterator.next();
+			FileToIdConverter resourceFinder = FileToIdConverter.json(getDirectory(registryKey));
 
-			for (Map.Entry<Identifier, Resource> entry : resourceFinder.findResources(manager).entrySet()) {
-				Identifier resourcePath = entry.getKey();
-				Identifier groupId = resourceFinder.toResourceId(resourcePath);
+			for (Map.Entry<ResourceLocation, Resource> entry : resourceFinder.listMatchingResources(manager).entrySet()) {
+				ResourceLocation resourcePath = entry.getKey();
+				ResourceLocation groupId = resourceFinder.fileToId(resourcePath);
 
-				try (Reader reader = entry.getValue().getReader()) {
+				try (Reader reader = entry.getValue().openAsReader()) {
 					JsonElement json = StrictJsonParser.parse(reader);
-					Codec<TagAliasGroup<Object>> codec = TagAliasGroup.codec((RegistryKey<? extends Registry<Object>>) registryKey);
+					Codec<TagAliasGroup<Object>> codec = TagAliasGroup.codec((ResourceKey<? extends Registry<Object>>) registryKey);
 
 					switch (codec.parse(JsonOps.INSTANCE, json)) {
 					case DataResult.Success(TagAliasGroup<Object> group, Lifecycle unused) -> {
@@ -102,11 +100,11 @@ public final class TagAliasLoader extends SinglePreparationResourceReloader<Map<
 		return dataByRegistry;
 	}
 
-	private static String getDirectory(RegistryKey<? extends Registry<?>> registryKey) {
+	private static String getDirectory(ResourceKey<? extends Registry<?>> registryKey) {
 		String directory = "fabric/tag_alias/";
-		Identifier registryId = registryKey.getValue();
+		ResourceLocation registryId = registryKey.location();
 
-		if (!Identifier.DEFAULT_NAMESPACE.equals(registryId.getNamespace())) {
+		if (!ResourceLocation.DEFAULT_NAMESPACE.equals(registryId.getNamespace())) {
 			directory += registryId.getNamespace() + '/';
 		}
 
@@ -114,8 +112,8 @@ public final class TagAliasLoader extends SinglePreparationResourceReloader<Map<
 	}
 
 	@Override
-	protected void apply(Map<RegistryKey<? extends Registry<?>>, List<TagAliasLoader.Data>> prepared, ResourceManager manager, Profiler profiler) {
-		for (Map.Entry<RegistryKey<? extends Registry<?>>, List<Data>> entry : prepared.entrySet()) {
+	protected void apply(Map<ResourceKey<? extends Registry<?>>, List<TagAliasLoader.Data>> prepared, ResourceManager manager, ProfilerFiller profiler) {
+		for (Map.Entry<ResourceKey<? extends Registry<?>>, List<Data>> entry : prepared.entrySet()) {
 			Map<TagKey<?>, Set<TagKey<?>>> groupsByTag = new HashMap<>();
 
 			for (Data data : entry.getValue()) {
@@ -142,19 +140,19 @@ public final class TagAliasLoader extends SinglePreparationResourceReloader<Map<
 			// Remove any groups of one tag, we don't need to apply them.
 			groupsByTag.values().removeIf(tags -> tags.size() == 1);
 
-			RegistryWrapper.Impl<?> wrapper = registries.getOrThrow(entry.getKey());
+			HolderLookup.RegistryLookup<?> wrapper = registries.lookupOrThrow(entry.getKey());
 
 			if (wrapper instanceof TagAliasEnabledRegistryWrapper aliasWrapper) {
 				aliasWrapper.fabric_loadTagAliases(groupsByTag);
 			} else {
 				throw new ClassCastException("[Fabric] Couldn't apply tag aliases to registry wrapper %s (%s) since it doesn't implement TagAliasEnabledRegistryWrapper"
-						.formatted(wrapper, entry.getKey().getValue()));
+						.formatted(wrapper, entry.getKey().location()));
 			}
 		}
 	}
 
-	public static <T> void applyToDynamicRegistries(CombinedDynamicRegistries<T> registries, T phase) {
-		Iterator<DynamicRegistryManager.Entry<?>> registryEntries = registries.get(phase).streamAllRegistries().iterator();
+	public static <T> void applyToDynamicRegistries(LayeredRegistryAccess<T> registries, T phase) {
+		Iterator<RegistryAccess.RegistryEntry<?>> registryEntries = registries.getLayer(phase).registries().iterator();
 
 		while (registryEntries.hasNext()) {
 			Registry<?> registry = registryEntries.next().value();
@@ -172,6 +170,6 @@ public final class TagAliasLoader extends SinglePreparationResourceReloader<Map<
 		}
 	}
 
-	protected record Data(Identifier groupId, TagAliasGroup<?> group) {
+	protected record Data(ResourceLocation groupId, TagAliasGroup<?> group) {
 	}
 }

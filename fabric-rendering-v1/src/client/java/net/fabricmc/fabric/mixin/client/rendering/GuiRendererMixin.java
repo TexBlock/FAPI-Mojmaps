@@ -27,14 +27,12 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-
-import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.render.GuiRenderer;
-import net.minecraft.client.gui.render.SpecialGuiElementRenderer;
+import net.minecraft.client.gui.render.pip.PictureInPictureRenderer;
 import net.minecraft.client.gui.render.state.GuiRenderState;
-import net.minecraft.client.gui.render.state.special.SpecialGuiElementRenderState;
-import net.minecraft.client.render.VertexConsumerProvider;
-
+import net.minecraft.client.gui.render.state.pip.PictureInPictureRenderState;
+import net.minecraft.client.renderer.MultiBufferSource;
 import net.fabricmc.fabric.impl.client.rendering.SpecialGuiElementRegistryImpl;
 
 @Mixin(GuiRenderer.class)
@@ -42,11 +40,11 @@ abstract class GuiRendererMixin {
 	@Shadow
 	@Final
 	@Mutable
-	private Map<Class<? extends SpecialGuiElementRenderState>, SpecialGuiElementRenderer<?>> specialElementRenderers;
+	private Map<Class<? extends PictureInPictureRenderState>, PictureInPictureRenderer<?>> pictureInPictureRenderers;
 
 	@Inject(method = "<init>", at = @At(value = "RETURN"))
-	private void mutableSpecialElementRenderers(GuiRenderState state, VertexConsumerProvider.Immediate vertexConsumers, List<SpecialGuiElementRenderer<?>> specialElementRenderers, CallbackInfo ci) {
-		this.specialElementRenderers = new IdentityHashMap<>(this.specialElementRenderers);
-		SpecialGuiElementRegistryImpl.onReady(MinecraftClient.getInstance(), vertexConsumers, this.specialElementRenderers);
+	private void mutableSpecialElementRenderers(GuiRenderState state, MultiBufferSource.BufferSource vertexConsumers, List<PictureInPictureRenderer<?>> specialElementRenderers, CallbackInfo ci) {
+		this.pictureInPictureRenderers = new IdentityHashMap<>(this.pictureInPictureRenderers);
+		SpecialGuiElementRegistryImpl.onReady(Minecraft.getInstance(), vertexConsumers, this.pictureInPictureRenderers);
 	}
 }

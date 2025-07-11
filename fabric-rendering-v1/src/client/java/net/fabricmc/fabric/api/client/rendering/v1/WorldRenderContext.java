@@ -17,27 +17,25 @@
 package net.fabricmc.fabric.api.client.rendering.v1;
 
 import com.google.common.base.Preconditions;
+import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.VertexConsumer;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Matrix4f;
-
-import net.minecraft.block.BlockState;
-import net.minecraft.client.render.Camera;
-import net.minecraft.client.render.Frustum;
-import net.minecraft.client.render.GameRenderer;
-import net.minecraft.client.render.RenderTickCounter;
-import net.minecraft.client.render.VertexConsumer;
-import net.minecraft.client.render.VertexConsumerProvider;
-import net.minecraft.client.render.WorldRenderer;
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.client.world.ClientWorld;
-import net.minecraft.entity.Entity;
-import net.minecraft.util.math.BlockPos;
-
 import net.fabricmc.fabric.impl.client.rendering.WorldRendererHooks;
+import net.minecraft.client.Camera;
+import net.minecraft.client.DeltaTracker;
+import net.minecraft.client.multiplayer.ClientLevel;
+import net.minecraft.client.renderer.GameRenderer;
+import net.minecraft.client.renderer.LevelRenderer;
+import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.culling.Frustum;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.level.block.state.BlockState;
 
 /**
  * Except as noted below, the properties exposed here match the parameters passed to
- * {@link WorldRenderer#render}.
+ * {@link LevelRenderer#renderLevel}.
  */
 public interface WorldRenderContext {
 	/**
@@ -49,7 +47,7 @@ public interface WorldRenderContext {
 	 * @return The world render context for the world renderer
 	 * @throws IllegalStateException If not currently rendering the world
 	 */
-	static WorldRenderContext getInstance(WorldRenderer worldRenderer) {
+	static WorldRenderContext getInstance(LevelRenderer worldRenderer) {
 		Preconditions.checkNotNull(worldRenderer, "worldRenderer");
 		return ((WorldRendererHooks) worldRenderer).fabric$getWorldRenderContext();
 	}
@@ -59,9 +57,9 @@ public interface WorldRenderContext {
 	 *
 	 * @return WorldRenderer instance invoking the event
 	 */
-	WorldRenderer worldRenderer();
+	LevelRenderer worldRenderer();
 
-	RenderTickCounter tickCounter();
+	DeltaTracker tickCounter();
 
 	boolean blockOutlines();
 
@@ -78,7 +76,7 @@ public interface WorldRenderContext {
 	 *
 	 * @return world renderer's client world instance
 	 */
-	ClientWorld world();
+	ClientLevel world();
 
 	/**
 	 * Test to know if "fabulous" graphics mode is enabled.
@@ -109,7 +107,7 @@ public interface WorldRenderContext {
 	 * overdrawn or cleared.
 	 */
 	@Nullable
-	VertexConsumerProvider consumers();
+	MultiBufferSource consumers();
 
 	/**
 	 * View frustum, after it is initialized. Will be {@code null} during
@@ -122,7 +120,7 @@ public interface WorldRenderContext {
 	 * The matrix stack is only not null in {@link WorldRenderEvents#AFTER_ENTITIES} or later events.
 	 */
 	@Nullable
-	MatrixStack matrixStack();
+	PoseStack matrixStack();
 
 	/**
 	 * Meant to be used in {@link WorldRenderEvents#BEFORE_BLOCK_OUTLINE} and {@link WorldRenderEvents#BLOCK_OUTLINE}.

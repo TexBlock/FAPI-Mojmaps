@@ -19,23 +19,21 @@ package net.fabricmc.fabric.mixin.renderer.client.block.render;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
-
-import net.minecraft.block.BlockState;
-import net.minecraft.client.render.VertexConsumer;
-import net.minecraft.client.render.VertexConsumerProvider;
-import net.minecraft.client.render.entity.feature.MooshroomMushroomFeatureRenderer;
-import net.minecraft.client.render.model.BlockStateModel;
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.EmptyBlockRenderView;
-
+import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.fabricmc.fabric.api.renderer.v1.render.FabricBlockModelRenderer;
+import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.block.model.BlockStateModel;
+import net.minecraft.client.renderer.entity.layers.MushroomCowMushroomLayer;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.EmptyBlockAndTintGetter;
+import net.minecraft.world.level.block.state.BlockState;
 
-@Mixin(MooshroomMushroomFeatureRenderer.class)
+@Mixin(MushroomCowMushroomLayer.class)
 abstract class MooshroomMushroomFeatureRendererMixin {
 	// Fix tinted quads being rendered completely black and provide the BlockState as context.
-	@Redirect(method = "renderMushroom", at = @At(value = "INVOKE", target = "net/minecraft/client/render/block/BlockModelRenderer.render(Lnet/minecraft/client/util/math/MatrixStack$Entry;Lnet/minecraft/client/render/VertexConsumer;Lnet/minecraft/client/render/model/BlockStateModel;FFFII)V"))
-	private void renderProxy(MatrixStack.Entry matrices, VertexConsumer vertexConsumer, BlockStateModel model, float red, float green, float blue, int light, int overlay, MatrixStack matrixStack, VertexConsumerProvider vertexConsumers, int light1, boolean outline, BlockState mushroomState, int overlay1, BlockStateModel mushroomModel) {
-		FabricBlockModelRenderer.render(matrices, layer -> vertexConsumer, model, 1, 1, 1, light, overlay, EmptyBlockRenderView.INSTANCE, BlockPos.ORIGIN, mushroomState);
+	@Redirect(method = "renderMushroomBlock", at = @At(value = "INVOKE", target = "net/minecraft/client/render/block/BlockModelRenderer.render(Lnet/minecraft/client/util/math/MatrixStack$Entry;Lnet/minecraft/client/render/VertexConsumer;Lnet/minecraft/client/render/model/BlockStateModel;FFFII)V"))
+	private void renderProxy(PoseStack.Pose matrices, VertexConsumer vertexConsumer, BlockStateModel model, float red, float green, float blue, int light, int overlay, PoseStack matrixStack, MultiBufferSource vertexConsumers, int light1, boolean outline, BlockState mushroomState, int overlay1, BlockStateModel mushroomModel) {
+		FabricBlockModelRenderer.render(matrices, layer -> vertexConsumer, model, 1, 1, 1, light, overlay, EmptyBlockAndTintGetter.INSTANCE, BlockPos.ZERO, mushroomState);
 	}
 }

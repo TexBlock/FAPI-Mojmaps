@@ -17,14 +17,12 @@
 package net.fabricmc.fabric.api.client.rendering.v1;
 
 import java.util.List;
-
-import net.minecraft.client.gui.hud.DebugHud;
-
 import net.fabricmc.fabric.api.event.Event;
 import net.fabricmc.fabric.api.event.EventFactory;
+import net.minecraft.client.gui.components.DebugScreenOverlay;
 
 /**
- * Provides events that give control over the string lists rendered on both sides of the {@link DebugHud}.
+ * Provides events that give control over the string lists rendered on both sides of the {@link DebugScreenOverlay}.
  *
  * <p>The strings do support <a href="https://minecraft.wiki/w/Formatting_codes">formatting codes</a>.
  */
@@ -53,7 +51,7 @@ public final class GatherDebugTextEvents {
 	@FunctionalInterface
 	public interface Left {
 		/**
-		 * @param lines the mutable result of {@link DebugHud#getLeftText()}
+		 * @param lines the mutable result of {@link DebugScreenOverlay#getGameInformation()}
 		 */
 		void onGatherLeftDebugText(List<String> lines);
 	}
@@ -61,7 +59,7 @@ public final class GatherDebugTextEvents {
 	@FunctionalInterface
 	public interface Right {
 		/**
-		 * @param lines the mutable result of {@link DebugHud#getRightText()}
+		 * @param lines the mutable result of {@link DebugScreenOverlay#getSystemInformation()}
 		 */
 		void onGatherRightDebugText(List<String> lines);
 	}

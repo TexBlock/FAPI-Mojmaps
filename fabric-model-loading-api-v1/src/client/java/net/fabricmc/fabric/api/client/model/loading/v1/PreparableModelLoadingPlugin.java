@@ -23,10 +23,8 @@ import java.util.function.Supplier;
 
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.UnmodifiableView;
-
-import net.minecraft.resource.ResourceManager;
-
 import net.fabricmc.fabric.impl.client.model.loading.ModelLoadingPluginManager;
+import net.minecraft.server.packs.resources.ResourceManager;
 
 /**
  * A model loading plugin is used to extend the model loading process through the passed

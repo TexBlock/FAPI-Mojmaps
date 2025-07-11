@@ -26,17 +26,15 @@ import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.mutable.MutableBoolean;
 import org.jetbrains.annotations.VisibleForTesting;
-
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.render.RenderTickCounter;
-import net.minecraft.util.Identifier;
-
 import net.fabricmc.fabric.api.client.rendering.v1.hud.HudElement;
 import net.fabricmc.fabric.api.client.rendering.v1.hud.VanillaHudElements;
+import net.minecraft.client.DeltaTracker;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.resources.ResourceLocation;
 
 public class HudElementRegistryImpl {
 	@VisibleForTesting
-	static final List<Identifier> VANILLA_ELEMENT_IDS = List.of(
+	static final List<ResourceLocation> VANILLA_ELEMENT_IDS = List.of(
 			VanillaHudElements.MISC_OVERLAYS,
 			VanillaHudElements.CROSSHAIR,
 			VanillaHudElements.SPECTATOR_MENU,
@@ -67,27 +65,27 @@ public class HudElementRegistryImpl {
 	 * This map should not be modified. Modify {@link RootLayer#layers()} instead.
 	 */
 	@VisibleForTesting
-	public static final Map<Identifier, RootLayer> ROOT_ELEMENTS = VANILLA_ELEMENT_IDS.stream()
+	public static final Map<ResourceLocation, RootLayer> ROOT_ELEMENTS = VANILLA_ELEMENT_IDS.stream()
 			.map(RootLayer::new)
 			.collect(Collectors.toMap(RootLayer::id, Function.identity(), (a, b) -> a, IdentityHashMap::new));
 	private static final RootLayer FIRST = ROOT_ELEMENTS.get(VanillaHudElements.MISC_OVERLAYS);
 	private static final RootLayer LAST = ROOT_ELEMENTS.get(VanillaHudElements.SUBTITLES);
 
-	public static RootLayer getRoot(Identifier id) {
+	public static RootLayer getRoot(ResourceLocation id) {
 		return ROOT_ELEMENTS.get(id);
 	}
 
-	public static void addFirst(Identifier id, HudElement element) {
+	public static void addFirst(ResourceLocation id, HudElement element) {
 		validateUnique(id);
 		FIRST.layers().addFirst(HudLayer.ofElement(id, element));
 	}
 
-	public static void addLast(Identifier id, HudElement element) {
+	public static void addLast(ResourceLocation id, HudElement element) {
 		validateUnique(id);
 		LAST.layers().addLast(HudLayer.ofElement(id, element));
 	}
 
-	public static void attachElementBefore(Identifier beforeThis, Identifier id, HudElement element) {
+	public static void attachElementBefore(ResourceLocation beforeThis, ResourceLocation id, HudElement element) {
 		validateUnique(id);
 
 		boolean didChange = findLayer(beforeThis, (l, iterator) -> {
@@ -102,7 +100,7 @@ public class HudElementRegistryImpl {
 		}
 	}
 
-	public static void attachElementAfter(Identifier afterThis, Identifier id, HudElement element) {
+	public static void attachElementAfter(ResourceLocation afterThis, ResourceLocation id, HudElement element) {
 		validateUnique(id);
 
 		boolean didChange = findLayer(afterThis, (l, iterator) -> {
@@ -115,7 +113,7 @@ public class HudElementRegistryImpl {
 		}
 	}
 
-	public static void removeElement(Identifier identifier) {
+	public static void removeElement(ResourceLocation identifier) {
 		boolean didChange = findLayer(identifier, (l, iterator) -> {
 			iterator.set(HudLayer.of(l.id(), l::element, true));
 			return true;
@@ -126,7 +124,7 @@ public class HudElementRegistryImpl {
 		}
 	}
 
-	public static void replaceElement(Identifier identifier, Function<HudElement, HudElement> replacer) {
+	public static void replaceElement(ResourceLocation identifier, Function<HudElement, HudElement> replacer) {
 		boolean didChange = findLayer(identifier, (l, iterator) -> {
 			iterator.set(HudLayer.of(l.id(), replacer.compose(l::element), l.isRemoved()));
 			return true;
@@ -138,7 +136,7 @@ public class HudElementRegistryImpl {
 	}
 
 	@VisibleForTesting
-	static void validateUnique(Identifier id) {
+	static void validateUnique(ResourceLocation id) {
 		visitLayers((l, iterator) -> {
 			if (l.id().equals(id)) {
 				throw new IllegalArgumentException("Layer with identifier " + id + " already exists");
@@ -152,7 +150,7 @@ public class HudElementRegistryImpl {
 	 * @return true if an element with the given identifier was found
 	 */
 	@VisibleForTesting
-	static boolean findLayer(Identifier identifier, LayerVisitor visitor) {
+	static boolean findLayer(ResourceLocation identifier, LayerVisitor visitor) {
 		MutableBoolean found = new MutableBoolean(false);
 
 		visitLayers((l, iterator) -> {
@@ -171,7 +169,7 @@ public class HudElementRegistryImpl {
 	static boolean visitLayers(LayerVisitor visitor) {
 		boolean modified = false;
 
-		for (Identifier id : VANILLA_ELEMENT_IDS) {
+		for (ResourceLocation id : VANILLA_ELEMENT_IDS) {
 			RootLayer rootLayer = ROOT_ELEMENTS.get(id);
 			modified |= visitLayers(rootLayer.layers(), visitor);
 		}
@@ -205,13 +203,13 @@ public class HudElementRegistryImpl {
 	/**
 	 * An element that wraps a vanilla element using a list, allowing for users to attach layers before or after it, replace it, or remove it.
 	 */
-	public record RootLayer(Identifier id, List<HudLayer> layers) {
-		private RootLayer(Identifier id) {
+	public record RootLayer(ResourceLocation id, List<HudLayer> layers) {
+		private RootLayer(ResourceLocation id) {
 			this(id, new ArrayList<>());
 			layers().add(HudLayer.ofVanilla(id));
 		}
 
-		public void render(DrawContext context, RenderTickCounter tickCounter, HudElement vanillaElement) {
+		public void render(GuiGraphics context, DeltaTracker tickCounter, HudElement vanillaElement) {
 			for (HudLayer layer : layers) {
 				if (!layer.isRemoved()) {
 					layer.element(vanillaElement).render(context, tickCounter);

@@ -24,7 +24,7 @@ public class EntityEventTestsClient implements ClientModInitializer {
 	@Override
 	public void onInitializeClient() {
 		LivingEntityFeatureRenderEvents.ALLOW_CAPE_RENDER.register(state -> {
-			return !state.equippedChestStack.isOf(EntityEventTests.DIAMOND_ELYTRA);
+			return !state.chestEquipment.is(EntityEventTests.DIAMOND_ELYTRA);
 		});
 	}
 }

@@ -22,19 +22,17 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
-
-import net.minecraft.client.gui.hud.DebugHud;
-
 import net.fabricmc.fabric.api.client.rendering.v1.GatherDebugTextEvents;
+import net.minecraft.client.gui.components.DebugScreenOverlay;
 
-@Mixin(DebugHud.class)
+@Mixin(DebugScreenOverlay.class)
 abstract class DebugHudMixin {
-	@Inject(method = "getLeftText", at = @At("RETURN"))
+	@Inject(method = "getGameInformation", at = @At("RETURN"))
 	protected void getLeftText(CallbackInfoReturnable<List<String>> ci) {
 		GatherDebugTextEvents.LEFT.invoker().onGatherLeftDebugText(ci.getReturnValue());
 	}
 
-	@Inject(method = "getRightText", at = @At("RETURN"))
+	@Inject(method = "getSystemInformation", at = @At("RETURN"))
 	protected void getRightText(CallbackInfoReturnable<List<String>> ci) {
 		GatherDebugTextEvents.RIGHT.invoker().onGatherRightDebugText(ci.getReturnValue());
 	}

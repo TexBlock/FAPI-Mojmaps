@@ -16,52 +16,52 @@
 
 package net.fabricmc.fabric.api.renderer.v1.render;
 
-import net.minecraft.block.BlockState;
-import net.minecraft.client.render.BlockRenderLayer;
-import net.minecraft.client.render.RenderLayer;
-import net.minecraft.client.render.RenderLayers;
-import net.minecraft.client.render.TexturedRenderLayers;
-import net.minecraft.client.render.VertexConsumerProvider;
+import net.minecraft.client.renderer.ItemBlockRenderTypes;
+import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.Sheets;
+import net.minecraft.client.renderer.chunk.ChunkSectionLayer;
+import net.minecraft.world.level.block.state.BlockState;
 
 public final class RenderLayerHelper {
 	private RenderLayerHelper() {
 	}
 
 	/**
-	 * Same logic as {@link RenderLayers#getMovingBlockLayer}, but accepts a {@link BlockRenderLayer} instead of a
+	 * Same logic as {@link ItemBlockRenderTypes#getMovingBlockRenderType}, but accepts a {@link ChunkSectionLayer} instead of a
 	 * {@link BlockState}.
 	 */
-	public static RenderLayer getMovingBlockLayer(BlockRenderLayer layer) {
+	public static RenderType getMovingBlockLayer(ChunkSectionLayer layer) {
 		return switch (layer) {
-		case SOLID -> RenderLayer.getSolid();
-		case CUTOUT_MIPPED -> RenderLayer.getCutoutMipped();
-		case CUTOUT -> RenderLayer.getCutout();
-		case TRANSLUCENT -> RenderLayer.getTranslucentMovingBlock();
-		case TRIPWIRE -> RenderLayer.getTripwire();
+		case SOLID -> RenderType.solid();
+		case CUTOUT_MIPPED -> RenderType.cutoutMipped();
+		case CUTOUT -> RenderType.cutout();
+		case TRANSLUCENT -> RenderType.translucentMovingBlock();
+		case TRIPWIRE -> RenderType.tripwire();
 		};
 	}
 
 	/**
-	 * Same logic as {@link RenderLayers#getEntityBlockLayer}, but accepts a {@link BlockRenderLayer} instead of a
+	 * Same logic as {@link ItemBlockRenderTypes#getRenderType}, but accepts a {@link ChunkSectionLayer} instead of a
 	 * {@link BlockState}.
 	 */
-	public static RenderLayer getEntityBlockLayer(BlockRenderLayer layer) {
-		return layer == BlockRenderLayer.TRANSLUCENT ? TexturedRenderLayers.getItemEntityTranslucentCull() : TexturedRenderLayers.getEntityCutout();
+	public static RenderType getEntityBlockLayer(ChunkSectionLayer layer) {
+		return layer == ChunkSectionLayer.TRANSLUCENT ? Sheets.translucentItemSheet() : Sheets.cutoutBlockSheet();
 	}
 
 	/**
-	 * Wraps the given provider, converting {@link BlockRenderLayer}s to render layers using
-	 * {@link #getMovingBlockLayer(BlockRenderLayer)}.
+	 * Wraps the given provider, converting {@link ChunkSectionLayer}s to render layers using
+	 * {@link #getMovingBlockLayer(ChunkSectionLayer)}.
 	 */
-	public static BlockVertexConsumerProvider movingDelegate(VertexConsumerProvider vertexConsumers) {
+	public static BlockVertexConsumerProvider movingDelegate(MultiBufferSource vertexConsumers) {
 		return layer -> vertexConsumers.getBuffer(RenderLayerHelper.getMovingBlockLayer(layer));
 	}
 
 	/**
-	 * Wraps the given provider, converting {@link BlockRenderLayer}s to render layers using
-	 * {@link #getEntityBlockLayer(BlockRenderLayer)}.
+	 * Wraps the given provider, converting {@link ChunkSectionLayer}s to render layers using
+	 * {@link #getEntityBlockLayer(ChunkSectionLayer)}.
 	 */
-	public static BlockVertexConsumerProvider entityDelegate(VertexConsumerProvider vertexConsumers) {
+	public static BlockVertexConsumerProvider entityDelegate(MultiBufferSource vertexConsumers) {
 		return layer -> vertexConsumers.getBuffer(RenderLayerHelper.getEntityBlockLayer(layer));
 	}
 }

@@ -16,44 +16,42 @@
 
 package net.fabricmc.fabric.test.model.loading;
 
+import com.mojang.blaze3d.vertex.PoseStack;
 import java.util.function.Supplier;
 
 import org.joml.AxisAngle4f;
 import org.joml.Quaternionf;
-
-import net.minecraft.block.Blocks;
-import net.minecraft.client.render.OverlayTexture;
-import net.minecraft.client.render.VertexConsumerProvider;
-import net.minecraft.client.render.entity.feature.FeatureRenderer;
-import net.minecraft.client.render.entity.feature.FeatureRendererContext;
-import net.minecraft.client.render.entity.model.EntityModel;
-import net.minecraft.client.render.entity.state.LivingEntityRenderState;
-import net.minecraft.client.render.model.BlockStateModel;
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.world.EmptyBlockRenderView;
-
 import net.fabricmc.fabric.api.renderer.v1.render.FabricBlockModelRenderer;
 import net.fabricmc.fabric.api.renderer.v1.render.RenderLayerHelper;
+import net.minecraft.client.model.EntityModel;
+import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.block.model.BlockStateModel;
+import net.minecraft.client.renderer.entity.RenderLayerParent;
+import net.minecraft.client.renderer.entity.layers.RenderLayer;
+import net.minecraft.client.renderer.entity.state.LivingEntityRenderState;
+import net.minecraft.client.renderer.texture.OverlayTexture;
+import net.minecraft.core.BlockPos;
+import net.minecraft.util.Mth;
+import net.minecraft.world.level.EmptyBlockAndTintGetter;
+import net.minecraft.world.level.block.Blocks;
 
-public class BakedModelFeatureRenderer<S extends LivingEntityRenderState, M extends EntityModel<S>> extends FeatureRenderer<S, M> {
+public class BakedModelFeatureRenderer<S extends LivingEntityRenderState, M extends EntityModel<S>> extends RenderLayer<S, M> {
 	private final Supplier<BlockStateModel> modelSupplier;
 
-	public BakedModelFeatureRenderer(FeatureRendererContext<S, M> context, Supplier<BlockStateModel> modelSupplier) {
+	public BakedModelFeatureRenderer(RenderLayerParent<S, M> context, Supplier<BlockStateModel> modelSupplier) {
 		super(context);
 		this.modelSupplier = modelSupplier;
 	}
 
 	@Override
-	public void render(MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, S state, float limbAngle, float limbDistance) {
+	public void render(PoseStack matrices, MultiBufferSource vertexConsumers, int light, S state, float limbAngle, float limbDistance) {
 		BlockStateModel model = modelSupplier.get();
-		matrices.push();
-		matrices.multiply(new Quaternionf(new AxisAngle4f(state.age * 0.07F - state.bodyYaw * MathHelper.RADIANS_PER_DEGREE, 0, 1, 0)));
+		matrices.pushPose();
+		matrices.mulPose(new Quaternionf(new AxisAngle4f(state.ageInTicks * 0.07F - state.bodyRot * Mth.DEG_TO_RAD, 0, 1, 0)));
 		matrices.scale(-0.75F, -0.75F, 0.75F);
-		float aboveHead = (float) (Math.sin(state.age * 0.08F)) * 0.5F + 0.5F;
+		float aboveHead = (float) (Math.sin(state.ageInTicks * 0.08F)) * 0.5F + 0.5F;
 		matrices.translate(-0.5F, 0.75F + aboveHead, -0.5F);
-		FabricBlockModelRenderer.render(matrices.peek(), RenderLayerHelper.entityDelegate(vertexConsumers), model, 1, 1, 1, light, OverlayTexture.DEFAULT_UV, EmptyBlockRenderView.INSTANCE, BlockPos.ORIGIN, Blocks.AIR.getDefaultState());
-		matrices.pop();
+		FabricBlockModelRenderer.render(matrices.last(), RenderLayerHelper.entityDelegate(vertexConsumers), model, 1, 1, 1, light, OverlayTexture.NO_OVERLAY, EmptyBlockAndTintGetter.INSTANCE, BlockPos.ZERO, Blocks.AIR.defaultBlockState());
+		matrices.popPose();
 	}
 }

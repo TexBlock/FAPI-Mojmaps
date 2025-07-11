@@ -16,14 +16,13 @@
 
 package net.fabricmc.fabric.impl.tag;
 
-import net.minecraft.resource.ResourceType;
-
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
+import net.minecraft.server.packs.PackType;
 
 public final class TagInit implements ModInitializer {
 	@Override
 	public void onInitialize() {
-		ResourceManagerHelper.get(ResourceType.SERVER_DATA).registerReloadListener(TagAliasLoader.ID, TagAliasLoader::new);
+		ResourceManagerHelper.get(PackType.SERVER_DATA).registerReloadListener(TagAliasLoader.ID, TagAliasLoader::new);
 	}
 }

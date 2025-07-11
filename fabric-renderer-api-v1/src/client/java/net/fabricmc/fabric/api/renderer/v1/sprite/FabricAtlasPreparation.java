@@ -16,12 +16,11 @@
 
 package net.fabricmc.fabric.api.renderer.v1.sprite;
 
-import net.minecraft.client.render.model.SpriteAtlasManager;
-
 import net.fabricmc.fabric.api.renderer.v1.model.SpriteFinder;
+import net.minecraft.client.resources.model.AtlasSet;
 
 /**
- * Note: This interface is automatically implemented on {@link SpriteAtlasManager.AtlasPreparation} via Mixin and interface injection.
+ * Note: This interface is automatically implemented on {@link AtlasSet.StitchResult} via Mixin and interface injection.
  */
 public interface FabricAtlasPreparation {
 	/**

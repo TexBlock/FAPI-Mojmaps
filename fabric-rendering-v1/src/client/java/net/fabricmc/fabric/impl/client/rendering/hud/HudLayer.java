@@ -17,30 +17,28 @@
 package net.fabricmc.fabric.impl.client.rendering.hud;
 
 import java.util.function.Function;
-
-import net.minecraft.util.Identifier;
-
 import net.fabricmc.fabric.api.client.rendering.v1.hud.HudElement;
+import net.minecraft.resources.ResourceLocation;
 
 public interface HudLayer {
-	Identifier id();
+	ResourceLocation id();
 
 	HudElement element(HudElement vanillaElement);
 
 	boolean isRemoved();
 
-	static HudLayer ofVanilla(Identifier id) {
+	static HudLayer ofVanilla(ResourceLocation id) {
 		return of(id, Function.identity(), false);
 	}
 
-	static HudLayer ofElement(Identifier id, HudElement element) {
+	static HudLayer ofElement(ResourceLocation id, HudElement element) {
 		return of(id, $ -> element, false);
 	}
 
-	static HudLayer of(Identifier id, Function<HudElement, HudElement> operator, boolean isRemoved) {
+	static HudLayer of(ResourceLocation id, Function<HudElement, HudElement> operator, boolean isRemoved) {
 		return new HudLayer() {
 			@Override
-			public Identifier id() {
+			public ResourceLocation id() {
 				return id;
 			}
 

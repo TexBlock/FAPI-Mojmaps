@@ -18,39 +18,37 @@ package net.fabricmc.fabric.impl.client.rendering;
 
 import org.jetbrains.annotations.Nullable;
 import org.joml.Matrix4f;
-
-import net.minecraft.block.BlockState;
-import net.minecraft.client.render.Camera;
-import net.minecraft.client.render.Frustum;
-import net.minecraft.client.render.GameRenderer;
-import net.minecraft.client.render.RenderLayer;
-import net.minecraft.client.render.RenderTickCounter;
-import net.minecraft.client.render.VertexConsumer;
-import net.minecraft.client.render.VertexConsumerProvider;
-import net.minecraft.client.render.WorldRenderer;
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.client.world.ClientWorld;
-import net.minecraft.entity.Entity;
-import net.minecraft.util.math.BlockPos;
-
+import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderContext;
+import net.minecraft.client.Camera;
+import net.minecraft.client.DeltaTracker;
+import net.minecraft.client.multiplayer.ClientLevel;
+import net.minecraft.client.renderer.GameRenderer;
+import net.minecraft.client.renderer.LevelRenderer;
+import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.culling.Frustum;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.level.block.state.BlockState;
 
 public final class WorldRenderContextImpl implements WorldRenderContext.BlockOutlineContext, WorldRenderContext {
-	private WorldRenderer worldRenderer;
-	private RenderTickCounter tickCounter;
+	private LevelRenderer worldRenderer;
+	private DeltaTracker tickCounter;
 	private boolean blockOutlines;
 	private Camera camera;
 	private GameRenderer gameRenderer;
 	private Matrix4f positionMatrix;
 	private Matrix4f projectionMatrix;
-	private VertexConsumerProvider consumers;
+	private MultiBufferSource consumers;
 	private boolean advancedTranslucency;
-	private ClientWorld world;
+	private ClientLevel world;
 
 	@Nullable
 	private Frustum frustum;
 	@Nullable
-	private MatrixStack matrixStack;
+	private PoseStack matrixStack;
 	private boolean translucentBlockOutline;
 
 	private Entity entity;
@@ -63,16 +61,16 @@ public final class WorldRenderContextImpl implements WorldRenderContext.BlockOut
 	public boolean renderBlockOutline = true;
 
 	public void prepare(
-			WorldRenderer worldRenderer,
-			RenderTickCounter tickCounter,
+			LevelRenderer worldRenderer,
+			DeltaTracker tickCounter,
 			boolean blockOutlines,
 			Camera camera,
 			GameRenderer gameRenderer,
 			Matrix4f positionMatrix,
 			Matrix4f projectionMatrix,
-			VertexConsumerProvider consumers,
+			MultiBufferSource consumers,
 			boolean advancedTranslucency,
-			ClientWorld world
+			ClientLevel world
 	) {
 		this.worldRenderer = worldRenderer;
 		this.tickCounter = tickCounter;
@@ -93,7 +91,7 @@ public final class WorldRenderContextImpl implements WorldRenderContext.BlockOut
 		this.frustum = frustum;
 	}
 
-	public void setMatrixStack(MatrixStack matrixStack) {
+	public void setMatrixStack(PoseStack matrixStack) {
 		this.matrixStack = matrixStack;
 	}
 
@@ -118,12 +116,12 @@ public final class WorldRenderContextImpl implements WorldRenderContext.BlockOut
 	}
 
 	@Override
-	public WorldRenderer worldRenderer() {
+	public LevelRenderer worldRenderer() {
 		return worldRenderer;
 	}
 
 	@Override
-	public RenderTickCounter tickCounter() {
+	public DeltaTracker tickCounter() {
 		return this.tickCounter;
 	}
 
@@ -153,7 +151,7 @@ public final class WorldRenderContextImpl implements WorldRenderContext.BlockOut
 	}
 
 	@Override
-	public ClientWorld world() {
+	public ClientLevel world() {
 		return world;
 	}
 
@@ -163,7 +161,7 @@ public final class WorldRenderContextImpl implements WorldRenderContext.BlockOut
 	}
 
 	@Override
-	public VertexConsumerProvider consumers() {
+	public MultiBufferSource consumers() {
 		return consumers;
 	}
 
@@ -175,7 +173,7 @@ public final class WorldRenderContextImpl implements WorldRenderContext.BlockOut
 
 	@Override
 	@Nullable
-	public MatrixStack matrixStack() {
+	public PoseStack matrixStack() {
 		return matrixStack;
 	}
 
@@ -217,6 +215,6 @@ public final class WorldRenderContextImpl implements WorldRenderContext.BlockOut
 	@Deprecated
 	@Override
 	public VertexConsumer vertexConsumer() {
-		return consumers.getBuffer(RenderLayer.getLines());
+		return consumers.getBuffer(RenderType.lines());
 	}
 }

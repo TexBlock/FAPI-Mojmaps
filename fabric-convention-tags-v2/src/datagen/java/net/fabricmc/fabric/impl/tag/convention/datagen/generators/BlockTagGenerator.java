@@ -18,19 +18,17 @@ package net.fabricmc.fabric.impl.tag.convention.datagen.generators;
 
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
-
-import net.minecraft.block.Block;
-import net.minecraft.block.Blocks;
-import net.minecraft.registry.RegistryKeys;
-import net.minecraft.registry.RegistryWrapper;
-import net.minecraft.registry.tag.BlockTags;
-import net.minecraft.registry.tag.TagKey;
-import net.minecraft.util.Identifier;
-
 import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput;
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricTagProvider;
 import net.fabricmc.fabric.api.tag.convention.v2.ConventionalBlockTags;
 import net.fabricmc.fabric.api.tag.convention.v2.TagUtil;
+import net.minecraft.core.HolderLookup;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.tags.BlockTags;
+import net.minecraft.tags.TagKey;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
 
 public final class BlockTagGenerator extends FabricTagProvider.BlockTagProvider {
 	static List<Block> VILLAGER_JOB_SITE_BLOCKS = List.of(
@@ -52,12 +50,12 @@ public final class BlockTagGenerator extends FabricTagProvider.BlockTagProvider 
 			Blocks.STONECUTTER
 	);
 
-	public BlockTagGenerator(FabricDataOutput output, CompletableFuture<RegistryWrapper.WrapperLookup> registriesFuture) {
+	public BlockTagGenerator(FabricDataOutput output, CompletableFuture<HolderLookup.Provider> registriesFuture) {
 		super(output, registriesFuture);
 	}
 
 	@Override
-	protected void configure(RegistryWrapper.WrapperLookup registries) {
+	protected void addTags(HolderLookup.Provider registries) {
 		valueLookupBuilder(ConventionalBlockTags.STONES)
 				.add(Blocks.STONE)
 				.add(Blocks.ANDESITE)
@@ -741,19 +739,19 @@ public final class BlockTagGenerator extends FabricTagProvider.BlockTagProvider 
 		// Backwards compat with pre-1.21 tags. Done after so optional tag is last for better readability.
 		// TODO: Remove backwards compat tag entries in 1.22
 
-		valueLookupBuilder(ConventionalBlockTags.RELOCATION_NOT_SUPPORTED).addOptionalTag(TagKey.of(RegistryKeys.BLOCK, Identifier.of(TagUtil.C_TAG_NAMESPACE, "movement_restricted")));
-		valueLookupBuilder(ConventionalBlockTags.QUARTZ_ORES).addOptionalTag(TagKey.of(RegistryKeys.BLOCK, Identifier.of(TagUtil.C_TAG_NAMESPACE, "quartz_ores")));
-		valueLookupBuilder(ConventionalBlockTags.WOODEN_BARRELS).addOptionalTag(TagKey.of(RegistryKeys.BLOCK, Identifier.of(TagUtil.C_TAG_NAMESPACE, "wooden_barrels")));
-		valueLookupBuilder(ConventionalBlockTags.WOODEN_CHESTS).addOptionalTag(TagKey.of(RegistryKeys.BLOCK, Identifier.of(TagUtil.C_TAG_NAMESPACE, "wooden_chests")));
-		valueLookupBuilder(ConventionalBlockTags.SANDSTONE_BLOCKS).addOptionalTag(TagKey.of(RegistryKeys.BLOCK, Identifier.of(TagUtil.C_TAG_NAMESPACE, "sandstone_blocks")));
-		valueLookupBuilder(ConventionalBlockTags.SANDSTONE_SLABS).addOptionalTag(TagKey.of(RegistryKeys.BLOCK, Identifier.of(TagUtil.C_TAG_NAMESPACE, "sandstone_slabs")));
-		valueLookupBuilder(ConventionalBlockTags.SANDSTONE_STAIRS).addOptionalTag(TagKey.of(RegistryKeys.BLOCK, Identifier.of(TagUtil.C_TAG_NAMESPACE, "sandstone_stairs")));
-		valueLookupBuilder(ConventionalBlockTags.RED_SANDSTONE_BLOCKS).addOptionalTag(TagKey.of(RegistryKeys.BLOCK, Identifier.of(TagUtil.C_TAG_NAMESPACE, "red_sandstone_blocks")));
-		valueLookupBuilder(ConventionalBlockTags.RED_SANDSTONE_SLABS).addOptionalTag(TagKey.of(RegistryKeys.BLOCK, Identifier.of(TagUtil.C_TAG_NAMESPACE, "red_sandstone_slabs")));
-		valueLookupBuilder(ConventionalBlockTags.RED_SANDSTONE_STAIRS).addOptionalTag(TagKey.of(RegistryKeys.BLOCK, Identifier.of(TagUtil.C_TAG_NAMESPACE, "red_sandstone_stairs")));
-		valueLookupBuilder(ConventionalBlockTags.UNCOLORED_SANDSTONE_BLOCKS).addOptionalTag(TagKey.of(RegistryKeys.BLOCK, Identifier.of(TagUtil.C_TAG_NAMESPACE, "uncolored_sandstone_blocks")));
-		valueLookupBuilder(ConventionalBlockTags.UNCOLORED_SANDSTONE_SLABS).addOptionalTag(TagKey.of(RegistryKeys.BLOCK, Identifier.of(TagUtil.C_TAG_NAMESPACE, "uncolored_sandstone_slabs")));
-		valueLookupBuilder(ConventionalBlockTags.UNCOLORED_SANDSTONE_STAIRS).addOptionalTag(TagKey.of(RegistryKeys.BLOCK, Identifier.of(TagUtil.C_TAG_NAMESPACE, "uncolored_sandstone_stairs")));
+		valueLookupBuilder(ConventionalBlockTags.RELOCATION_NOT_SUPPORTED).addOptionalTag(TagKey.create(Registries.BLOCK, ResourceLocation.fromNamespaceAndPath(TagUtil.C_TAG_NAMESPACE, "movement_restricted")));
+		valueLookupBuilder(ConventionalBlockTags.QUARTZ_ORES).addOptionalTag(TagKey.create(Registries.BLOCK, ResourceLocation.fromNamespaceAndPath(TagUtil.C_TAG_NAMESPACE, "quartz_ores")));
+		valueLookupBuilder(ConventionalBlockTags.WOODEN_BARRELS).addOptionalTag(TagKey.create(Registries.BLOCK, ResourceLocation.fromNamespaceAndPath(TagUtil.C_TAG_NAMESPACE, "wooden_barrels")));
+		valueLookupBuilder(ConventionalBlockTags.WOODEN_CHESTS).addOptionalTag(TagKey.create(Registries.BLOCK, ResourceLocation.fromNamespaceAndPath(TagUtil.C_TAG_NAMESPACE, "wooden_chests")));
+		valueLookupBuilder(ConventionalBlockTags.SANDSTONE_BLOCKS).addOptionalTag(TagKey.create(Registries.BLOCK, ResourceLocation.fromNamespaceAndPath(TagUtil.C_TAG_NAMESPACE, "sandstone_blocks")));
+		valueLookupBuilder(ConventionalBlockTags.SANDSTONE_SLABS).addOptionalTag(TagKey.create(Registries.BLOCK, ResourceLocation.fromNamespaceAndPath(TagUtil.C_TAG_NAMESPACE, "sandstone_slabs")));
+		valueLookupBuilder(ConventionalBlockTags.SANDSTONE_STAIRS).addOptionalTag(TagKey.create(Registries.BLOCK, ResourceLocation.fromNamespaceAndPath(TagUtil.C_TAG_NAMESPACE, "sandstone_stairs")));
+		valueLookupBuilder(ConventionalBlockTags.RED_SANDSTONE_BLOCKS).addOptionalTag(TagKey.create(Registries.BLOCK, ResourceLocation.fromNamespaceAndPath(TagUtil.C_TAG_NAMESPACE, "red_sandstone_blocks")));
+		valueLookupBuilder(ConventionalBlockTags.RED_SANDSTONE_SLABS).addOptionalTag(TagKey.create(Registries.BLOCK, ResourceLocation.fromNamespaceAndPath(TagUtil.C_TAG_NAMESPACE, "red_sandstone_slabs")));
+		valueLookupBuilder(ConventionalBlockTags.RED_SANDSTONE_STAIRS).addOptionalTag(TagKey.create(Registries.BLOCK, ResourceLocation.fromNamespaceAndPath(TagUtil.C_TAG_NAMESPACE, "red_sandstone_stairs")));
+		valueLookupBuilder(ConventionalBlockTags.UNCOLORED_SANDSTONE_BLOCKS).addOptionalTag(TagKey.create(Registries.BLOCK, ResourceLocation.fromNamespaceAndPath(TagUtil.C_TAG_NAMESPACE, "uncolored_sandstone_blocks")));
+		valueLookupBuilder(ConventionalBlockTags.UNCOLORED_SANDSTONE_SLABS).addOptionalTag(TagKey.create(Registries.BLOCK, ResourceLocation.fromNamespaceAndPath(TagUtil.C_TAG_NAMESPACE, "uncolored_sandstone_slabs")));
+		valueLookupBuilder(ConventionalBlockTags.UNCOLORED_SANDSTONE_STAIRS).addOptionalTag(TagKey.create(Registries.BLOCK, ResourceLocation.fromNamespaceAndPath(TagUtil.C_TAG_NAMESPACE, "uncolored_sandstone_stairs")));
 		valueLookupBuilder(ConventionalBlockTags.GLAZED_TERRACOTTAS).addOptionalTag(ConventionalBlockTags.GLAZED_TERRACOTTA);
 		valueLookupBuilder(ConventionalBlockTags.CONCRETES).addOptionalTag(ConventionalBlockTags.CONCRETE);
 	}

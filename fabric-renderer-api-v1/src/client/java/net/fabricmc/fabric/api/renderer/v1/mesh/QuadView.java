@@ -21,17 +21,15 @@ import org.jetbrains.annotations.Nullable;
 import org.joml.Vector2f;
 import org.joml.Vector3f;
 import org.joml.Vector3fc;
-
-import net.minecraft.client.render.BlockRenderLayer;
-import net.minecraft.client.render.LightmapTextureManager;
-import net.minecraft.client.render.VertexFormats;
-import net.minecraft.client.render.item.ItemRenderState;
-import net.minecraft.client.render.model.BakedQuad;
-import net.minecraft.client.texture.Sprite;
-import net.minecraft.util.math.Direction;
-
+import com.mojang.blaze3d.vertex.DefaultVertexFormat;
 import net.fabricmc.fabric.api.renderer.v1.model.SpriteFinder;
 import net.fabricmc.fabric.api.util.TriState;
+import net.minecraft.client.renderer.LightTexture;
+import net.minecraft.client.renderer.block.model.BakedQuad;
+import net.minecraft.client.renderer.chunk.ChunkSectionLayer;
+import net.minecraft.client.renderer.item.ItemStackRenderState;
+import net.minecraft.client.renderer.texture.TextureAtlasSprite;
+import net.minecraft.core.Direction;
 
 /**
  * Interface for reading quad data encoded in {@link Mesh}es.
@@ -46,7 +44,7 @@ import net.fabricmc.fabric.api.util.TriState;
  */
 public interface QuadView {
 	/** Count of integers in a conventional (un-modded) block or item vertex. */
-	int VANILLA_VERTEX_STRIDE = VertexFormats.POSITION_COLOR_TEXTURE_LIGHT_NORMAL.getVertexSize() / 4;
+	int VANILLA_VERTEX_STRIDE = DefaultVertexFormat.BLOCK.getVertexSize() / 4;
 
 	/** Count of integers in a conventional (un-modded) block or item quad. */
 	int VANILLA_QUAD_STRIDE = VANILLA_VERTEX_STRIDE * 4;
@@ -145,7 +143,7 @@ public interface QuadView {
 	 * Gets the light face of this quad as implied by its {@linkplain #faceNormal() face normal}. It is equal to the
 	 * axis-aligned direction closest to the face normal, and is never {@code null}.
 	 *
-	 * <p>This method is equivalent to {@link BakedQuad#face()}.
+	 * <p>This method is equivalent to {@link BakedQuad#direction()}.
 	 */
 	@NotNull
 	Direction lightFace();
@@ -163,10 +161,10 @@ public interface QuadView {
 	Direction cullFace();
 
 	/**
-	 * @see MutableQuadView#renderLayer(BlockRenderLayer)
+	 * @see MutableQuadView#renderLayer(ChunkSectionLayer)
 	 */
 	@Nullable
-	BlockRenderLayer renderLayer();
+	ChunkSectionLayer renderLayer();
 
 	/**
 	 * @see MutableQuadView#emissive(boolean)
@@ -186,10 +184,10 @@ public interface QuadView {
 	TriState ambientOcclusion();
 
 	/**
-	 * @see MutableQuadView#glint(ItemRenderState.Glint)
+	 * @see MutableQuadView#glint(ItemStackRenderState.FoilType)
 	 */
 	@Nullable
-	ItemRenderState.Glint glint();
+	ItemStackRenderState.FoilType glint();
 
 	/**
 	 * @see MutableQuadView#shadeMode(ShadeMode)
@@ -211,7 +209,7 @@ public interface QuadView {
 	/**
 	 * Outputs this quad's vertex data into the given array, starting at the given index. The array must have at least
 	 * {@link #VANILLA_QUAD_STRIDE} elements available starting at the given index. The format of the data is the same
-	 * as {@link BakedQuad#vertexData()}. Lightmap values and normals will be populated even though vanilla does not use
+	 * as {@link BakedQuad#vertices()}. Lightmap values and normals will be populated even though vanilla does not use
 	 * them.
 	 */
 	void toVanilla(int[] target, int startIndex);
@@ -223,7 +221,7 @@ public interface QuadView {
 	 * @param sprite The sprite is not serialized so it must be provided by the caller. Retrieve it using
 	 * {@link SpriteFinder#find(QuadView)} if it is not already known.
 	 */
-	default BakedQuad toBakedQuad(Sprite sprite) {
+	default BakedQuad toBakedQuad(TextureAtlasSprite sprite) {
 		int[] vertexData = new int[VANILLA_QUAD_STRIDE];
 		toVanilla(vertexData, 0);
 
@@ -240,8 +238,8 @@ public interface QuadView {
 					break;
 				}
 
-				int blockLight = LightmapTextureManager.getBlockLightCoordinates(lightmap);
-				int skyLight = LightmapTextureManager.getSkyLightCoordinates(lightmap);
+				int blockLight = LightTexture.block(lightmap);
+				int skyLight = LightTexture.sky(lightmap);
 				lightEmission = Math.min(lightEmission, Math.min(blockLight, skyLight));
 			}
 		}

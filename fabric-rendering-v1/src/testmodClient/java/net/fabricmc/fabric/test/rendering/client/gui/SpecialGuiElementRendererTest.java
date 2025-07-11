@@ -16,11 +16,10 @@
 
 package net.fabricmc.fabric.test.rendering.client.gui;
 
-import net.minecraft.client.gui.ScreenRect;
-
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
 import net.fabricmc.fabric.api.client.rendering.v1.SpecialGuiElementRegistry;
+import net.minecraft.client.gui.navigation.ScreenRectangle;
 
 /**
  * This test mod renders a banner in the top left corner.
@@ -33,7 +32,7 @@ public class SpecialGuiElementRendererTest implements ClientModInitializer {
 		// TODO: Migrate to new HUD API once available
 		//noinspection deprecation
 		HudRenderCallback.EVENT.register((context, tickCounter) -> {
-			context.state.addSpecialElement(new BannerGuiElementRenderState(20, 0, 40, 20, new ScreenRect(20, 0, 40, 20)));
+			context.guiRenderState.submitPicturesInPictureState(new BannerGuiElementRenderState(20, 0, 40, 20, new ScreenRectangle(20, 0, 40, 20)));
 		});
 	}
 }

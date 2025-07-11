@@ -21,21 +21,19 @@ import java.util.Map;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
-
-import net.minecraft.client.render.model.ErrorCollectingSpriteGetter;
-import net.minecraft.client.render.model.SpriteAtlasManager;
-import net.minecraft.util.Identifier;
-
 import net.fabricmc.fabric.api.renderer.v1.model.SpriteFinder;
+import net.minecraft.client.resources.model.AtlasSet;
+import net.minecraft.client.resources.model.SpriteGetter;
+import net.minecraft.resources.ResourceLocation;
 
-@Mixin(targets = "net/minecraft/client/render/model/BakedModelManager$1")
-abstract class BakedModelManager1Mixin implements ErrorCollectingSpriteGetter {
+@Mixin(targets = "net/minecraft/client/resources/model/ModelManager$1")
+abstract class BakedModelManager1Mixin implements SpriteGetter {
 	@Shadow
 	@Final
-	Map<Identifier, SpriteAtlasManager.AtlasPreparation> field_55477;
+	Map<ResourceLocation, AtlasSet.StitchResult> val$stitchedSprites;
 
 	@Override
-	public SpriteFinder spriteFinder(Identifier atlasId) {
-		return field_55477.get(atlasId).spriteFinder();
+	public SpriteFinder spriteFinder(ResourceLocation atlasId) {
+		return val$stitchedSprites.get(atlasId).spriteFinder();
 	}
 }

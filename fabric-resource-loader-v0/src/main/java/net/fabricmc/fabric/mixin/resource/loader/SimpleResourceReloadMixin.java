@@ -22,18 +22,16 @@ import com.llamalad7.mixinextras.sugar.Local;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.ModifyArg;
-
-import net.minecraft.resource.ResourceManager;
-import net.minecraft.resource.ResourceReloader;
-import net.minecraft.resource.SimpleResourceReload;
-
 import net.fabricmc.fabric.impl.resource.loader.FabricLifecycledResourceManager;
 import net.fabricmc.fabric.impl.resource.loader.ResourceManagerHelperImpl;
+import net.minecraft.server.packs.resources.PreparableReloadListener;
+import net.minecraft.server.packs.resources.ResourceManager;
+import net.minecraft.server.packs.resources.SimpleReloadInstance;
 
-@Mixin(SimpleResourceReload.class)
+@Mixin(SimpleReloadInstance.class)
 public class SimpleResourceReloadMixin {
-	@ModifyArg(method = "start(Lnet/minecraft/resource/ResourceManager;Ljava/util/List;Ljava/util/concurrent/Executor;Ljava/util/concurrent/Executor;Ljava/util/concurrent/CompletableFuture;Z)Lnet/minecraft/resource/ResourceReload;", at = @At(value = "INVOKE", target = "Lnet/minecraft/resource/SimpleResourceReload;create(Lnet/minecraft/resource/ResourceManager;Ljava/util/List;Ljava/util/concurrent/Executor;Ljava/util/concurrent/Executor;Ljava/util/concurrent/CompletableFuture;)Lnet/minecraft/resource/ResourceReload;"))
-	private static List<ResourceReloader> sortSimple(List<ResourceReloader> reloaders, @Local(argsOnly = true) ResourceManager resourceManager) {
+	@ModifyArg(method = "create(Lnet/minecraft/server/packs/resources/ResourceManager;Ljava/util/List;Ljava/util/concurrent/Executor;Ljava/util/concurrent/Executor;Ljava/util/concurrent/CompletableFuture;Z)Lnet/minecraft/server/packs/resources/ReloadInstance;", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/packs/resources/SimpleReloadInstance;of(Lnet/minecraft/server/packs/resources/ResourceManager;Ljava/util/List;Ljava/util/concurrent/Executor;Ljava/util/concurrent/Executor;Ljava/util/concurrent/CompletableFuture;)Lnet/minecraft/server/packs/resources/ReloadInstance;"))
+	private static List<PreparableReloadListener> sortSimple(List<PreparableReloadListener> reloaders, @Local(argsOnly = true) ResourceManager resourceManager) {
 		if (resourceManager instanceof FabricLifecycledResourceManager flrm) {
 			return ResourceManagerHelperImpl.sort(flrm.fabric_getResourceType(), reloaders);
 		}
@@ -41,8 +39,8 @@ public class SimpleResourceReloadMixin {
 		return reloaders;
 	}
 
-	@ModifyArg(method = "start(Lnet/minecraft/resource/ResourceManager;Ljava/util/List;Ljava/util/concurrent/Executor;Ljava/util/concurrent/Executor;Ljava/util/concurrent/CompletableFuture;Z)Lnet/minecraft/resource/ResourceReload;", at = @At(value = "INVOKE", target = "Lnet/minecraft/resource/ProfiledResourceReload;start(Lnet/minecraft/resource/ResourceManager;Ljava/util/List;Ljava/util/concurrent/Executor;Ljava/util/concurrent/Executor;Ljava/util/concurrent/CompletableFuture;)Lnet/minecraft/resource/ResourceReload;"))
-	private static List<ResourceReloader> sortProfiled(List<ResourceReloader> reloaders, @Local(argsOnly = true) ResourceManager resourceManager) {
+	@ModifyArg(method = "create(Lnet/minecraft/server/packs/resources/ResourceManager;Ljava/util/List;Ljava/util/concurrent/Executor;Ljava/util/concurrent/Executor;Ljava/util/concurrent/CompletableFuture;Z)Lnet/minecraft/server/packs/resources/ReloadInstance;", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/packs/resources/ProfiledReloadInstance;of(Lnet/minecraft/server/packs/resources/ResourceManager;Ljava/util/List;Ljava/util/concurrent/Executor;Ljava/util/concurrent/Executor;Ljava/util/concurrent/CompletableFuture;)Lnet/minecraft/server/packs/resources/ReloadInstance;"))
+	private static List<PreparableReloadListener> sortProfiled(List<PreparableReloadListener> reloaders, @Local(argsOnly = true) ResourceManager resourceManager) {
 		if (resourceManager instanceof FabricLifecycledResourceManager flrm) {
 			return ResourceManagerHelperImpl.sort(flrm.fabric_getResourceType(), reloaders);
 		}

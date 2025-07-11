@@ -16,20 +16,19 @@
 
 package net.fabricmc.fabric.test.rendering;
 
-import net.minecraft.component.DataComponentTypes;
-import net.minecraft.component.type.EquippableComponent;
-import net.minecraft.entity.EquipmentSlot;
-import net.minecraft.item.Items;
-
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.item.v1.DefaultItemComponentEvents;
+import net.minecraft.core.component.DataComponents;
+import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.item.equipment.Equippable;
 
 public final class ArmorRenderingTestsInit implements ModInitializer {
 	@Override
 	public void onInitialize() {
 		DefaultItemComponentEvents.MODIFY.register(context -> context.modify(Items.DIAMOND_SWORD, builder -> {
-			EquippableComponent component = EquippableComponent.builder(EquipmentSlot.HEAD).build();
-			builder.add(DataComponentTypes.EQUIPPABLE, component);
+			Equippable component = Equippable.builder(EquipmentSlot.HEAD).build();
+			builder.set(DataComponents.EQUIPPABLE, component);
 		}));
 	}
 }

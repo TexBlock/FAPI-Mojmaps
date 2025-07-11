@@ -32,35 +32,33 @@ import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-
-import net.minecraft.registry.RegistryOps;
-import net.minecraft.resource.JsonDataLoader;
-import net.minecraft.resource.Resource;
-import net.minecraft.resource.ResourceFinder;
-import net.minecraft.util.Identifier;
-
 import net.fabricmc.fabric.impl.resource.conditions.ResourceConditionsImpl;
+import net.minecraft.resources.FileToIdConverter;
+import net.minecraft.resources.RegistryOps;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.packs.resources.Resource;
+import net.minecraft.server.packs.resources.SimpleJsonResourceReloadListener;
 
-@Mixin(JsonDataLoader.class)
+@Mixin(SimpleJsonResourceReloadListener.class)
 public class JsonDataLoaderMixin {
 	@Unique
 	private static final Object SKIP_DATA_MARKER = new Object();
 
-	@WrapOperation(method = "load(Lnet/minecraft/resource/ResourceManager;Lnet/minecraft/resource/ResourceFinder;Lcom/mojang/serialization/DynamicOps;Lcom/mojang/serialization/Codec;Ljava/util/Map;)V", at = @At(value = "INVOKE", target = "Lcom/mojang/serialization/Codec;parse(Lcom/mojang/serialization/DynamicOps;Ljava/lang/Object;)Lcom/mojang/serialization/DataResult;", remap = false))
+	@WrapOperation(method = "scanDirectory(Lnet/minecraft/server/packs/resources/ResourceManager;Lnet/minecraft/resources/FileToIdConverter;Lcom/mojang/serialization/DynamicOps;Lcom/mojang/serialization/Codec;Ljava/util/Map;)V", at = @At(value = "INVOKE", target = "Lcom/mojang/serialization/Codec;parse(Lcom/mojang/serialization/DynamicOps;Ljava/lang/Object;)Lcom/mojang/serialization/DataResult;", remap = false))
 	private static DataResult<?> applyResourceConditions(Codec<?> instance, DynamicOps<JsonElement> dynamicOps, Object object, Operation<DataResult<?>> original,
-														@Local(argsOnly = true) ResourceFinder resourceFinder,
-														@Local Map.Entry<Identifier, Resource> entry) {
+														@Local(argsOnly = true) FileToIdConverter resourceFinder,
+														@Local Map.Entry<ResourceLocation, Resource> entry) {
 		final JsonElement resourceData = (JsonElement) object;
-		@Nullable RegistryOps.RegistryInfoGetter registryInfo = null;
+		@Nullable RegistryOps.RegistryInfoLookup registryInfo = null;
 
 		if (dynamicOps instanceof RegistryOpsAccessor registryOps) {
-			registryInfo = registryOps.getRegistryInfoGetter();
+			registryInfo = registryOps.getLookupProvider();
 		}
 
 		if (resourceData.isJsonObject()) {
 			JsonObject obj = resourceData.getAsJsonObject();
 
-			final String dataType = ((ResourceFinderAccessor) resourceFinder).getDirectoryName();
+			final String dataType = ((ResourceFinderAccessor) resourceFinder).getPrefix();
 
 			if (!ResourceConditionsImpl.applyResourceConditions(obj, dataType, entry.getKey(), registryInfo)) {
 				return DataResult.success(SKIP_DATA_MARKER);
@@ -71,8 +69,8 @@ public class JsonDataLoaderMixin {
 	}
 
 	// parse.ifSuccess
-	@Inject(method = "method_63568", at = @At("HEAD"), cancellable = true)
-	private static void skipData(Map<?, ?> map, Identifier identifier, Object object, CallbackInfo ci) {
+	@Inject(method = "lambda$scanDirectory$0", at = @At("HEAD"), cancellable = true)
+	private static void skipData(Map<?, ?> map, ResourceLocation identifier, Object object, CallbackInfo ci) {
 		if (object == SKIP_DATA_MARKER) {
 			ci.cancel();
 		}

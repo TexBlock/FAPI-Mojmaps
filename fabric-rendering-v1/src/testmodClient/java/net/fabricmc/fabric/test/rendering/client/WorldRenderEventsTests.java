@@ -16,25 +16,24 @@
 
 package net.fabricmc.fabric.test.rendering.client;
 
-import net.minecraft.block.Blocks;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.render.OverlayTexture;
-import net.minecraft.client.render.RenderLayer;
-import net.minecraft.client.render.VertexRendering;
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Vec3d;
-
+import com.mojang.blaze3d.vertex.PoseStack;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderContext;
 import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderEvents;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.ShapeRenderer;
+import net.minecraft.client.renderer.texture.OverlayTexture;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.phys.Vec3;
 
 public class WorldRenderEventsTests implements ClientModInitializer {
 	private static boolean onBlockOutline(WorldRenderContext wrc, WorldRenderContext.BlockOutlineContext blockOutlineContext) {
-		if (blockOutlineContext.blockState().isOf(Blocks.DIAMOND_BLOCK)) {
-			MatrixStack matrixStack = new MatrixStack();
-			matrixStack.push();
-			Vec3d cameraPos = MinecraftClient.getInstance().gameRenderer.getCamera().getPos();
+		if (blockOutlineContext.blockState().is(Blocks.DIAMOND_BLOCK)) {
+			PoseStack matrixStack = new PoseStack();
+			matrixStack.pushPose();
+			Vec3 cameraPos = Minecraft.getInstance().gameRenderer.getMainCamera().getPosition();
 			BlockPos pos = blockOutlineContext.blockPos();
 			double x = pos.getX() - cameraPos.x;
 			double y = pos.getY() - cameraPos.y;
@@ -42,11 +41,11 @@ public class WorldRenderEventsTests implements ClientModInitializer {
 			matrixStack.translate(x+0.25, y+0.25+1, z+0.25);
 			matrixStack.scale(0.5f, 0.5f, 0.5f);
 
-			MinecraftClient.getInstance().getBlockRenderManager().renderBlockAsEntity(
-					Blocks.DIAMOND_BLOCK.getDefaultState(),
-					matrixStack, wrc.consumers(), 15728880, OverlayTexture.DEFAULT_UV);
+			Minecraft.getInstance().getBlockRenderer().renderSingleBlock(
+					Blocks.DIAMOND_BLOCK.defaultBlockState(),
+					matrixStack, wrc.consumers(), 15728880, OverlayTexture.NO_OVERLAY);
 
-			matrixStack.pop();
+			matrixStack.popPose();
 		}
 
 		return true;
@@ -56,15 +55,15 @@ public class WorldRenderEventsTests implements ClientModInitializer {
 	 * Renders a translucent filled box at (0, 100, 0).
 	 */
 	private static void renderAfterTranslucent(WorldRenderContext context) {
-		MatrixStack matrices = context.matrixStack();
-		Vec3d camera = context.camera().getPos();
+		PoseStack matrices = context.matrixStack();
+		Vec3 camera = context.camera().getPosition();
 
-		matrices.push();
+		matrices.pushPose();
 		matrices.translate(-camera.x, -camera.y, -camera.z);
 
-		VertexRendering.drawFilledBox(matrices, context.consumers().getBuffer(RenderLayer.getDebugFilledBox()), 0, 100, 0, 1, 101, 1, 0, 1, 0, 0.5f);
+		ShapeRenderer.addChainedFilledBoxVertices(matrices, context.consumers().getBuffer(RenderType.debugFilledBox()), 0, 100, 0, 1, 101, 1, 0, 1, 0, 0.5f);
 
-		matrices.pop();
+		matrices.popPose();
 	}
 
 	@Override
